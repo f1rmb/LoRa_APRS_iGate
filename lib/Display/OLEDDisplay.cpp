@@ -31,171 +31,231 @@
 
 #include "OLEDDisplay.h"
 
-OLEDDisplay::OLEDDisplay(OLEDDISPLAY_GEOMETRY g) : _geometry(g), _displayIsOn(false) {
+OLEDDisplay::OLEDDisplay(OLEDDISPLAY_GEOMETRY g) :
+m_geometry(g),
+m_displayIsOn(false)
+{
 }
 
-OLEDDisplay::~OLEDDisplay() {
-}
-
-// cppcheck-suppress unusedFunction
-void OLEDDisplay::displayOn() {
-  sendCommand(DISPLAYON);
-  _displayIsOn = true;
-}
-
-// cppcheck-suppress unusedFunction
-bool OLEDDisplay::isDisplayOn() const {
-  return _displayIsOn;
+OLEDDisplay::~OLEDDisplay()
+{
 }
 
 // cppcheck-suppress unusedFunction
-void OLEDDisplay::displayOff() {
-  sendCommand(DISPLAYOFF);
-  _displayIsOn = false;
+void OLEDDisplay::displayOn()
+{
+    sendCommand(DISPLAYON);
+    m_displayIsOn = true;
 }
 
 // cppcheck-suppress unusedFunction
-bool OLEDDisplay::isDisplayOff() const {
-  return !_displayIsOn;
+bool OLEDDisplay::isDisplayOn() const
+{
+    return m_displayIsOn;
 }
 
 // cppcheck-suppress unusedFunction
-void OLEDDisplay::invertDisplay() {
-  sendCommand(INVERTDISPLAY);
+void OLEDDisplay::displayOff()
+{
+    sendCommand(DISPLAYOFF);
+    m_displayIsOn = false;
 }
 
 // cppcheck-suppress unusedFunction
-void OLEDDisplay::normalDisplay() {
-  sendCommand(NORMALDISPLAY);
+bool OLEDDisplay::isDisplayOff() const
+{
+    return !m_displayIsOn;
 }
 
 // cppcheck-suppress unusedFunction
-void OLEDDisplay::setContrast(uint8_t contrast, uint8_t precharge, uint8_t comdetect) {
-  sendCommand(SETPRECHARGE); // 0xD9
-  sendCommand(precharge);    // 0xF1 default, to lower the contrast, put 1-1F
-  sendCommand(SETCONTRAST);
-  sendCommand(contrast);      // 0-255
-  sendCommand(SETVCOMDETECT); // 0xDB, (additionally needed to lower the contrast)
-  sendCommand(comdetect);     // 0x40 default, to lower the contrast, put 0
-  sendCommand(DISPLAYALLON_RESUME);
-  sendCommand(NORMALDISPLAY);
-  sendCommand(DISPLAYON);
+void OLEDDisplay::invertDisplay()
+{
+    sendCommand(INVERTDISPLAY);
 }
 
 // cppcheck-suppress unusedFunction
-void OLEDDisplay::setBrightness(uint8_t brightness) {
-  uint8_t contrast = brightness * 1.171 - 43;
-  if (brightness < 128) {
-    // Magic values to get a smooth/ step-free transition
-    contrast = brightness * 1.171;
-  }
-
-  uint8_t precharge = 241;
-  if (brightness == 0) {
-    precharge = 0;
-  }
-  uint8_t comdetect = brightness / 8;
-  setContrast(contrast, precharge, comdetect);
+void OLEDDisplay::normalDisplay()
+{
+    sendCommand(NORMALDISPLAY);
 }
 
 // cppcheck-suppress unusedFunction
-void OLEDDisplay::resetOrientation() {
-  sendCommand(SEGREMAP);
-  sendCommand(COMSCANINC);
+void OLEDDisplay::setContrast(uint8_t contrast, uint8_t precharge, uint8_t comdetect)
+{
+    static const uint8_t clist[] =
+    {
+            SETPRECHARGE,  // 0xD9
+            precharge,     // 0xF1 default, to lower the contrast, put 1-1F
+            SETCONTRAST,
+            contrast,      // 0-255
+            SETVCOMDETECT, // 0xDB, (additionally needed to lower the contrast)
+            comdetect,     // 0x40 default, to lower the contrast, put 0
+            DISPLAYALLON_RESUME,
+            NORMALDISPLAY,
+            DISPLAYON
+    };
+    sendCommandList(clist, sizeof(clist));
 }
 
 // cppcheck-suppress unusedFunction
-void OLEDDisplay::flipScreenVertically() {
-  sendCommand(SEGREMAP | 0x01);
-  sendCommand(COMSCANDEC);
+void OLEDDisplay::setBrightness(uint8_t brightness)
+{
+    uint8_t contrast = brightness * 1.171 - 43;
+
+    if (brightness < 128)
+    {
+        // Magic values to get a smooth/ step-free transition
+        contrast = brightness * 1.171;
+    }
+
+    uint8_t precharge = 241;
+    if (brightness == 0)
+    {
+        precharge = 0;
+    }
+
+    uint8_t comdetect = brightness / 8;
+    setContrast(contrast, precharge, comdetect);
 }
 
 // cppcheck-suppress unusedFunction
-void OLEDDisplay::mirrorScreen() {
-  sendCommand(SEGREMAP);
-  sendCommand(COMSCANDEC);
-}
-
-void OLEDDisplay::display(Bitmap *bitmap) {
-  if (isDisplayOff()) {
-    displayOn();
-  }
-  internDisplay(bitmap);
-}
-
-// cppcheck-suppress unusedFunction
-void OLEDDisplay::clear() {
+void OLEDDisplay::resetOrientation()
+{
+    static const uint8_t clist[] =
+    {
+            SEGREMAP,
+            COMSCANINC
+    };
+    sendCommandList(clist, sizeof(clist));
 }
 
 // cppcheck-suppress unusedFunction
-uint OLEDDisplay::getWidth() {
-  switch (_geometry) {
-  case GEOMETRY_128_64:
-  case GEOMETRY_128_32:
-    return 128;
-  case GEOMETRY_64_48:
-  case GEOMETRY_64_32:
-    return 64;
-  }
-  return 0;
+void OLEDDisplay::rotate180()
+{
+    static const uint8_t clist[] =
+    {
+            (SEGREMAP | 0x01),
+            COMSCANDEC
+    };
+    sendCommandList(clist, sizeof(clist));
 }
 
 // cppcheck-suppress unusedFunction
-uint OLEDDisplay::getHeight() {
-  switch (_geometry) {
-  case GEOMETRY_128_64:
-    return 64;
-  case GEOMETRY_64_48:
-    return 48;
-  case GEOMETRY_128_32:
-  case GEOMETRY_64_32:
-    return 32;
-  }
-  return 0;
+void OLEDDisplay::flipScreenVertically()
+{
+    static const uint8_t clist[] =
+    {
+            SEGREMAP,
+            COMSCANDEC
+    };
+    sendCommandList(clist, sizeof(clist));
+}
+
+void OLEDDisplay::display(Bitmap *bitmap)
+{
+    if (isDisplayOff())
+    {
+        displayOn();
+    }
+
+    internDisplay(bitmap);
 }
 
 // cppcheck-suppress unusedFunction
-void OLEDDisplay::sendInitCommands() {
-  sendCommand(DISPLAYOFF);
-  sendCommand(SETDISPLAYCLOCKDIV);
-  sendCommand(0xF0); // Increase speed of the display max ~96Hz
-  sendCommand(SETMULTIPLEX);
-  sendCommand(this->getHeight() - 1);
-  sendCommand(SETDISPLAYOFFSET);
-  sendCommand(0x00);
-  if (_geometry == GEOMETRY_64_32) {
-    sendCommand(0x00);
-  } else {
-    sendCommand(SETSTARTLINE);
-  }
-  sendCommand(CHARGEPUMP);
-  sendCommand(0x14);
-  sendCommand(MEMORYMODE);
-  sendCommand(0x00);
-  sendCommand(SEGREMAP);
-  sendCommand(COMSCANINC);
-  sendCommand(SETCOMPINS);
+void OLEDDisplay::clear()
+{
+}
 
-  if (_geometry == GEOMETRY_128_64 || _geometry == GEOMETRY_64_48 || _geometry == GEOMETRY_64_32) {
-    sendCommand(0x12);
-  } else if (_geometry == GEOMETRY_128_32) {
-    sendCommand(0x02);
-  }
+// cppcheck-suppress unusedFunction
+uint16_t OLEDDisplay::getWidth()
+{
+    switch (m_geometry)
+    {
+        case GEOMETRY_128_64:
+        case GEOMETRY_128_32:
+            return 128U;
+        case GEOMETRY_64_48:
+        case GEOMETRY_64_32:
+            return 64U;
+    }
+    return 0U;
+}
 
-  sendCommand(SETCONTRAST);
+// cppcheck-suppress unusedFunction
+uint16_t OLEDDisplay::getHeight()
+{
+    switch (m_geometry)
+    {
+        case GEOMETRY_128_64:
+            return 64U;
+        case GEOMETRY_64_48:
+            return 48U;
+        case GEOMETRY_128_32:
+        case GEOMETRY_64_32:
+            return 32U;
+    }
+    return 0U;
+}
 
-  if (_geometry == GEOMETRY_128_64 || _geometry == GEOMETRY_64_48 || _geometry == GEOMETRY_64_32) {
-    sendCommand(0xCF);
-  } else if (_geometry == GEOMETRY_128_32) {
-    sendCommand(0x8F);
-  }
+// cppcheck-suppress unusedFunction
+void OLEDDisplay::sendInitCommands()
+{
+    uint8_t startline = (((m_geometry == GEOMETRY_64_32) ? 0x00U : SETSTARTLINE));
+    uint8_t contrast = (((m_geometry == GEOMETRY_128_32) ? 0x8FU : 0xCFU));
+    uint8_t compins = (((m_geometry == GEOMETRY_128_32) ? 0x02U : 0x12U));
 
-  sendCommand(SETPRECHARGE);
-  sendCommand(0xF1);
-  sendCommand(SETVCOMDETECT); // 0xDB, (additionally needed to lower the contrast)
-  sendCommand(0x40);          // 0x40 default, to lower the contrast, put 0
-  sendCommand(DISPLAYALLON_RESUME);
-  sendCommand(NORMALDISPLAY);
-  sendCommand(0x2e); // stop scroll
-  sendCommand(DISPLAYON);
+    static const uint8_t clist1[] =
+    {
+            DISPLAYOFF,
+            SETDISPLAYCLOCKDIV,
+#if 0
+            0xF0U, // Increase speed of the display max ~550kHz
+#else
+            0x80U, // the suggested ratio 0x80 (~400kHz)
+#endif
+            SETMULTIPLEX
+    };
+    sendCommandList(clist1, sizeof(clist1));
+
+    sendCommand((getHeight() - 1));
+
+    static const uint8_t clist2[] =
+    {
+            SETDISPLAYOFFSET,
+            0x00U,
+            startline,
+            CHARGEPUMP
+    };
+    sendCommandList(clist2, sizeof(clist2));
+
+    sendCommand(0x14U); // VCC
+
+    static const uint8_t clist3[] =
+    {
+            MEMORYMODE,
+            0x00U,
+            SEGREMAP,
+            COMSCANINC
+    };
+    sendCommandList(clist3, sizeof(clist3));
+
+    sendCommand(SETCOMPINS);
+    sendCommand(compins);
+
+    sendCommand(SETCONTRAST);
+    sendCommand(contrast);
+
+    sendCommand(SETPRECHARGE);
+    sendCommand(0xF1U);
+
+    static const uint8_t clist4[] =
+    {
+            SETVCOMDETECT,  // 0xDB, (additionally needed to lower the contrast)
+            0x40U,          // 0x40 default, to lower the contrast, put 0
+            DISPLAYALLON_RESUME,
+            NORMALDISPLAY,
+            DEACTIVATE_SCROLL,
+            DISPLAYON
+    };
+    sendCommandList(clist4, sizeof(clist4));
 }

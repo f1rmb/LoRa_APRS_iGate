@@ -6,50 +6,53 @@
 
 class OLEDDisplay;
 
-class Bitmap {
-public:
-  explicit Bitmap(uint width, uint height);
-  explicit Bitmap(OLEDDisplay *display);
-  virtual ~Bitmap();
+class Bitmap
+{
+        friend class SSD1306;
 
-  uint getWidth() const;
-  uint getHeight() const;
+    public:
+        explicit Bitmap(uint16_t width, uint16_t height);
+        explicit Bitmap(uint16_t width, uint16_t height, const uint8_t xBuffer[]);
+        explicit Bitmap(OLEDDisplay *display);
+        virtual ~Bitmap();
 
-  void setPixel(int x, int y);
-  void clearPixel(int x, int y);
-  bool getPixel(int x, int y) const;
-  void clear();
+        uint16_t getWidth() const;
+        uint16_t getHeight() const;
 
-  void drawLine(int x0, int y0, int x1, int y1);
-  void drawHorizontalLine(int x, int y, int length);
-  void drawVerticalLine(int x, int y, int length);
+        void setPixel(uint16_t x, uint16_t y);
+        void clearPixel(uint16_t x, uint16_t y);
+        bool getPixel(uint16_t x, uint16_t y) const;
+        void clear();
 
-  void drawRect(int x, int y, int width, int height);
-  void fillRect(int x, int y, int width, int height);
+        void drawLine(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1);
+        void drawHorizontalLine(uint16_t x, uint16_t y, uint16_t length);
+        void drawVerticalLine(uint16_t x, uint16_t y, uint16_t length);
 
-  void drawCircle(int x0, int y0, int radius);
-  void fillCircle(int x0, int y0, int radius);
-  void drawCircleQuads(int x0, int y0, int radius, int quads);
+        void drawRect(uint16_t x, uint16_t y, uint16_t width, uint16_t height);
+        void fillRect(uint16_t x, uint16_t y, uint16_t width, uint16_t height);
 
-  void drawProgressBar(int x, int y, int width, int height, int progress);
+        void drawCircle(uint16_t x0, uint16_t y0, uint16_t radius);
+        void fillCircle(uint16_t x0, uint16_t y0, uint16_t radius);
+        void drawCircleQuads(uint16_t x0, uint16_t y0, uint16_t radius, uint16_t quads);
 
-  int  drawChar(int x, int y, char c);
-  int  drawString(int x, int y, String text);
-  void drawStringf(int x, int y, char *buffer, String format, ...);
-  int  drawStringLF(int x, int y, String text);
-  void drawStringLFf(int x, int y, char *buffer, String format, ...);
+        void drawProgressBar(uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint16_t progress);
 
-  // void drawBitmap(int x, int y, const Bitmap & bitmap);
+        uint16_t  drawChar(uint16_t x, uint16_t y, bool invert, char c);
+        uint16_t  drawString(uint16_t x, uint16_t y, bool invert, String text);
+        void drawStringf(uint16_t x, uint16_t y, bool invert, char *buffer, String format, ...);
+        uint16_t  drawStringLF(uint16_t x, uint16_t y, bool invert, String text);
+        void drawStringLFf(uint16_t x, uint16_t y, bool invert, char *buffer, String format, ...);
 
-private:
-  const uint _width;
-  const uint _height;
+        // void drawBitmap(uint16_t x, uint16_t y, const Bitmap & bitmap);
 
-  uint8_t *_buffer;
+    private:
+        void allocateBuffer();
+        void writePixel(uint16_t x, uint16_t y, bool invert);
 
-  void allocateBuffer();
-
-  friend class SSD1306;
+    private:
+        const uint16_t   m_width;
+        const uint16_t   m_height;
+        uint8_t         *m_buffer;
 };
 
 #endif

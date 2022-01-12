@@ -37,104 +37,107 @@
 //#include "OLEDDisplayFonts.h"
 
 // Display commands
-#define CHARGEPUMP          0x8D
-#define COLUMNADDR          0x21
-#define COMSCANDEC          0xC8
-#define COMSCANINC          0xC0
-#define DISPLAYALLON        0xA5
-#define DISPLAYALLON_RESUME 0xA4
-#define DISPLAYOFF          0xAE
-#define DISPLAYON           0xAF
-#define EXTERNALVCC         0x1
-#define INVERTDISPLAY       0xA7
-#define MEMORYMODE          0x20
-#define NORMALDISPLAY       0xA6
-#define PAGEADDR            0x22
-#define SEGREMAP            0xA0
-#define SETCOMPINS          0xDA
-#define SETCONTRAST         0x81
-#define SETDISPLAYCLOCKDIV  0xD5
-#define SETDISPLAYOFFSET    0xD3
-#define SETHIGHCOLUMN       0x10
-#define SETLOWCOLUMN        0x00
-#define SETMULTIPLEX        0xA8
-#define SETPRECHARGE        0xD9
-#define SETSEGMENTREMAP     0xA1
-#define SETSTARTLINE        0x40
-#define SETVCOMDETECT       0xDB
-#define SWITCHCAPVCC        0x2
+#define CHARGEPUMP          0x8DU
+#define COLUMNADDR          0x21U
+#define COMSCANDEC          0xC8U
+#define COMSCANINC          0xC0U
+#define DISPLAYALLON        0xA5U
+#define DISPLAYALLON_RESUME 0xA4U
+#define DISPLAYOFF          0xAEU
+#define DISPLAYON           0xAFU
+#define EXTERNALVCC         0x01U
+#define INVERTDISPLAY       0xA7U
+#define MEMORYMODE          0x20U
+#define NORMALDISPLAY       0xA6U
+#define PAGEADDR            0x22U
+#define SEGREMAP            0xA0U
+#define SETCOMPINS          0xDAU
+#define SETCONTRAST         0x81U
+#define SETDISPLAYCLOCKDIV  0xD5U
+#define SETDISPLAYOFFSET    0xD3U
+#define SETHIGHCOLUMN       0x10U
+#define SETLOWCOLUMN        0x00U
+#define SETMULTIPLEX        0xA8U
+#define SETPRECHARGE        0xD9U
+#define SETSEGMENTREMAP     0xA1U
+#define SETSTARTLINE        0x40U
+#define SETVCOMDETECT       0xDBU
+#define SWITCHCAPVCC        0x02U
+#define DEACTIVATE_SCROLL   0x2EU
 
 enum OLEDDISPLAY_GEOMETRY
 {
-  GEOMETRY_128_64 = 0,
-  GEOMETRY_128_32 = 1,
-  GEOMETRY_64_48  = 2,
-  GEOMETRY_64_32  = 3
+    GEOMETRY_128_64 = 0,
+    GEOMETRY_128_32 = 1,
+    GEOMETRY_64_48  = 2,
+    GEOMETRY_64_32  = 3
 };
 
-class OLEDDisplay {
-public:
-  OLEDDisplay(OLEDDISPLAY_GEOMETRY g = GEOMETRY_128_64);
-  virtual ~OLEDDisplay();
+class OLEDDisplay
+{
+    public:
+        OLEDDisplay(OLEDDISPLAY_GEOMETRY g = GEOMETRY_128_64);
+        virtual ~OLEDDisplay();
 
-  // Turn the display on
-  void displayOn();
+        // Turn the display on
+        void displayOn();
 
-  // Is the Display on?
-  bool isDisplayOn() const;
+        // Is the Display on?
+        bool isDisplayOn() const;
 
-  // Turn the display offs
-  void displayOff();
+        // Turn the display offs
+        void displayOff();
 
-  // Is the Display off?
-  bool isDisplayOff() const;
+        // Is the Display off?
+        bool isDisplayOff() const;
 
-  // Inverted display mode
-  void invertDisplay();
+        // Inverted display mode
+        void invertDisplay();
 
-  // Normal display mode
-  void normalDisplay();
+        // Normal display mode
+        void normalDisplay();
 
-  // Set display contrast
-  // really low brightness & contrast: contrast = 10, precharge = 5, comdetect = 0
-  // normal brightness & contrast:  contrast = 100
-  void setContrast(uint8_t contrast, uint8_t precharge = 241, uint8_t comdetect = 64);
+        // Set display contrast
+        // really low brightness & contrast: contrast = 10, precharge = 5, comdetect = 0
+        // normal brightness & contrast:  contrast = 100
+        void setContrast(uint8_t contrast, uint8_t precharge = 241, uint8_t comdetect = 64);
 
-  // Convenience method to access
-  void setBrightness(uint8_t brightness);
+        // Convenience method to access
+        void setBrightness(uint8_t brightness);
 
-  // Reset display rotation or mirroring
-  void resetOrientation();
+        // Reset display rotation or mirroring
+        void resetOrientation();
 
-  // Turn the display upside down
-  void flipScreenVertically();
+        // Turn the display upside down
+        void rotate180();
 
-  // Mirror the display (to be used in a mirror or as a projector)
-  void mirrorScreen();
+        // Mirror the display (to be used in a mirror or as a projector)
+        void flipScreenVertically();
 
-  // Write the buffer to the display memory
-  void display(Bitmap *bitmap);
+        // Write the buffer to the display memory
+        void display(Bitmap *bitmap);
 
-  // Clear the local pixel buffer
-  void clear();
+        // Clear the local pixel buffer
+        void clear();
 
-  // Get screen geometry
-  uint getWidth();
-  uint getHeight();
+        // Get screen geometry
+        uint16_t getWidth();
+        uint16_t getHeight();
 
-protected:
-  // Send all the init commands
-  void sendInitCommands();
+    protected:
+        // Send all the init commands
+        void sendInitCommands();
 
-private:
-  OLEDDISPLAY_GEOMETRY _geometry;
+    private:
+        // Send a command to the display (low level function)
+        virtual void sendCommand(uint8_t com) = 0;
+        virtual void sendCommandList(const uint8_t *c, uint8_t n) = 0;
+        virtual void internDisplay(Bitmap *bitmap) = 0;
 
-  // Send a command to the display (low level function)
-  virtual void sendCommand(uint8_t com) = 0;
 
-  virtual void internDisplay(Bitmap *bitmap) = 0;
-
-  bool _displayIsOn;
+    private:
+        OLEDDISPLAY_GEOMETRY m_geometry;
+        bool                 m_displayIsOn;
 };
 
 #endif

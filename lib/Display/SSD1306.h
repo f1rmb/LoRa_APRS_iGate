@@ -34,19 +34,22 @@
 #include "OLEDDisplay.h"
 #include <Wire.h>
 
-class SSD1306 : public OLEDDisplay {
-public:
-  SSD1306(TwoWire *wire, uint8_t address, OLEDDISPLAY_GEOMETRY g = GEOMETRY_128_64);
-  virtual ~SSD1306();
+class SSD1306 : public OLEDDisplay
+{
+    public:
+        SSD1306(TwoWire *wire, uint8_t address, OLEDDISPLAY_GEOMETRY g = GEOMETRY_128_64);
+        virtual ~SSD1306();
 
-  virtual void internDisplay(Bitmap *bitmap) override;
+        virtual void internDisplay(Bitmap *bitmap) override;
 
-private:
-  TwoWire *_wire = NULL;
-  uint8_t  _address;
-  bool     _doI2cAutoInit = false;
+    private:
+        virtual void sendCommand(uint8_t command) override;
+        virtual void sendCommandList(const uint8_t *c, uint8_t n) override;
 
-  virtual void sendCommand(uint8_t command) override;
+    private:
+        TwoWire *m_wire;
+        uint8_t  m_address;
+
 };
 
 #endif
