@@ -19,6 +19,7 @@ class RouterTask : public Task
         TaskQueue<std::shared_ptr<APRSMessage>> &m_toAprsIs;
         std::shared_ptr<APRSMessage>             m_beaconMsg;
         Timer                                    m_beacon_timer;
+        bool                                     m_firstRun;
 };
 
 #endif

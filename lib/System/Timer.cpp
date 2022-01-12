@@ -31,7 +31,7 @@ bool Timer::isRunning() const
 
 bool Timer::hasExpired()
 {
-    return (millis() > m_nextTimeout);
+    return ((m_nextTimeout > 0UL) && (millis() > m_nextTimeout));
 }
 
 void Timer::start()

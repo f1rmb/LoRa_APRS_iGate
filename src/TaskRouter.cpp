@@ -11,7 +11,8 @@ RouterTask::RouterTask(TaskQueue<std::shared_ptr<APRSMessage>> &fromModem, TaskQ
 Task(TASK_ROUTER, TaskRouter),
 m_fromModem(fromModem),
 m_toModem(toModem),
-m_toAprsIs(toAprsIs)
+m_toAprsIs(toAprsIs),
+m_firstRun(true)
 {
 }
 
@@ -100,8 +101,9 @@ bool RouterTask::loop(System &system)
     }
 
     // check for beacon
-    if (m_beacon_timer.hasExpired())
+    if (m_firstRun || m_beacon_timer.hasExpired())
     {
+        m_firstRun = false;
         logPrintD("[" + timeString() + "] ");
         logPrintlnD(m_beaconMsg->encode());
 
