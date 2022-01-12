@@ -4,10 +4,8 @@
 
 #include "Task.h"
 #include "TaskRouter.h"
-#include "project_configuration.h"
-
-String create_lat_aprs(double lat);
-String create_long_aprs(double lng);
+#include "ProjectConfiguration.h"
+#include "Deg2DDMMMM.h"
 
 RouterTask::RouterTask(TaskQueue<std::shared_ptr<APRSMessage>> &fromModem, TaskQueue<std::shared_ptr<APRSMessage>> &toModem, TaskQueue<std::shared_ptr<APRSMessage>> &toAprsIs) :
 Task(TASK_ROUTER, TaskRouter),
@@ -23,15 +21,18 @@ RouterTask::~RouterTask()
 
 bool RouterTask::setup(System &system)
 {
+    Deg2DDMMMMPosition pLat, pLong;
+    char               latBuf[32], longBuf[32];
+
     // setup beacon
     m_beacon_timer.setTimeout(system.getUserConfig()->beacon.timeout * 60 * 1000);
 
     m_beaconMsg = std::shared_ptr<APRSMessage>(new APRSMessage());
     m_beaconMsg->setSource(system.getUserConfig()->callsign);
     m_beaconMsg->setDestination("APLG01");
-    String lat = create_lat_aprs(system.getUserConfig()->beacon.positionLatitude);
-    String lng = create_long_aprs(system.getUserConfig()->beacon.positionLongitude);
-    m_beaconMsg->getBody()->setData(String("=") + lat + "L" + lng + "&" + system.getUserConfig()->beacon.message);
+    Deg2DDMMMM::Convert(pLat, system.getUserConfig()->beacon.positionLatitude, false);
+    Deg2DDMMMM::Convert(pLong, system.getUserConfig()->beacon.positionLongitude, false);
+    m_beaconMsg->getBody()->setData(String("=") + Deg2DDMMMM::Format(latBuf, pLat, false) + "L" + Deg2DDMMMM::Format(longBuf, pLong, true) + "&" + system.getUserConfig()->beacon.message);
 
     return true;
 }

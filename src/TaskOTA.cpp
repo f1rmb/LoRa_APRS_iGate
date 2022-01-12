@@ -2,7 +2,7 @@
 
 #include "Task.h"
 #include "TaskOTA.h"
-#include "project_configuration.h"
+#include "ProjectConfiguration.h"
 
 OTATask::OTATask() :
 Task(TASK_OTA, TaskOta),

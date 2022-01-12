@@ -1,7 +1,7 @@
 #include <logger.h>
 
 #include "TaskDisplay.h"
-#include "project_configuration.h"
+#include "ProjectConfiguration.h"
 
 DisplayTask::DisplayTask() :
 Task("DisplayTask", 0)

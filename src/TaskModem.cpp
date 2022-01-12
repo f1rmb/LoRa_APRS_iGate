@@ -5,7 +5,7 @@
 #include "Task.h"
 #include "TaskAprsIs.h"
 #include "TaskModem.h"
-#include "project_configuration.h"
+#include "ProjectConfiguration.h"
 
 ModemTask::ModemTask(TaskQueue<std::shared_ptr<APRSMessage>> &fromModem, TaskQueue<std::shared_ptr<APRSMessage>> &toModem) :
 Task(TASK_MODEM, TaskModem),

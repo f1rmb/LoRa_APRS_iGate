@@ -4,7 +4,7 @@
 
 #include "Task.h"
 #include "TaskFTP.h"
-#include "project_configuration.h"
+#include "ProjectConfiguration.h"
 
 FTPTask::FTPTask() :
 Task(TASK_FTP, TaskFtp),

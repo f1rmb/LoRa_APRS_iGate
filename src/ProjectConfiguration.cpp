@@ -2,7 +2,7 @@
 
 #include <logger.h>
 
-#include "project_configuration.h"
+#include "ProjectConfiguration.h"
 
 void ProjectConfigurationManagement::readProjectConfiguration(DynamicJsonDocument &data, Configuration &conf)
 {

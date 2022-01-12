@@ -2,7 +2,7 @@
 
 #include "Task.h"
 #include "TaskAprsIs.h"
-#include "project_configuration.h"
+#include "ProjectConfiguration.h"
 
 AprsIsTask::AprsIsTask(TaskQueue<std::shared_ptr<APRSMessage>> &toAprsIs) :
 Task(TASK_APRS_IS, TaskAprsIs),

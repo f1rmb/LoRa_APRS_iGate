@@ -4,7 +4,7 @@
 
 #include "Task.h"
 #include "TaskEth.h"
-#include "project_configuration.h"
+#include "ProjectConfiguration.h"
 
 volatile bool eth_connected = false;
 

@@ -4,7 +4,7 @@
 
 #include "Task.h"
 #include "TaskNTP.h"
-#include "project_configuration.h"
+#include "ProjectConfiguration.h"
 
 NTPTask::NTPTask() :
 Task(TASK_NTP, TaskNtp),
