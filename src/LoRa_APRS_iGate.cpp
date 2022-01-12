@@ -18,7 +18,7 @@
 #include "TaskWifi.h"
 #include "project_configuration.h"
 
-#define VERSION "21.50.0"
+#define VERSION "22.02.0"
 
 String create_lat_aprs(double lat);
 String create_long_aprs(double lng);
@@ -116,15 +116,18 @@ void setup() {
 
   LoRaSystem.getTaskManager().setup(LoRaSystem);
 
-  LoRaSystem.getDisplay().showSpashScreen("LoRa APRS iGate", VERSION);
+  if ((LoRaSystem.getDisplay().getWidth() == 128) && (LoRaSystem.getDisplay().getHeight() == 64))
+    LoRaSystem.getDisplay().showSpashScreen(VERSION);
+  else
+    LoRaSystem.getDisplay().showSpashScreen("LoRa  APRS  iGate", VERSION);
 
-  if (userConfig.callsign == "NOCALL-10") {
+  if (userConfig.callsign.startsWith("NOCALL")) {
     logPrintlnE("You have to change your settings in 'data/is-cfg.json' and upload it via \"Upload File System image\"!");
     LoRaSystem.getDisplay().showStatusScreen("ERROR", "You have to change your settings in 'data/is-cfg.json' and upload it via \"Upload File System image\"!");
     while (true)
       ;
   }
-  if ((!userConfig.aprs_is.active) && !(userConfig.digi.active)) {
+  if ((userConfig.aprs_is.active == false) && (userConfig.digi.active == false)) {
     logPrintlnE("No mode selected (iGate or Digi)! You have to activate one of iGate or Digi.");
     LoRaSystem.getDisplay().showStatusScreen("ERROR", "No mode selected (iGate or Digi)! You have to activate one of iGate or Digi.");
     while (true)
