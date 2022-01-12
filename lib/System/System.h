@@ -8,27 +8,28 @@
 #include <Display.h>
 #include <configuration.h>
 
-class System {
-public:
-  System();
-  ~System();
+class System
+{
+    public:
+        System();
+        ~System();
 
-  void setBoardConfig(BoardConfig const *const boardConfig);
-  void setUserConfig(Configuration const *const userConfig);
+        void setBoardConfig(BoardConfig const *const boardConfig);
+        void setUserConfig(Configuration const *const userConfig);
 
-  BoardConfig const *const   getBoardConfig() const;
-  Configuration const *const getUserConfig() const;
-  TaskManager &              getTaskManager();
-  Display &                  getDisplay();
-  bool                       isWifiEthConnected() const;
-  void                       connectedViaWifiEth(bool status);
+        BoardConfig const *const   getBoardConfig() const;
+        Configuration const *const getUserConfig() const;
+        TaskManager               &getTaskManager();
+        Display                   &getDisplay();
+        bool                       isWifiEthConnected() const;
+        void                       connectedViaWifiEth(bool status);
 
-private:
-  BoardConfig const *  _boardConfig;
-  Configuration const *_userConfig;
-  TaskManager          _taskManager;
-  Display              _display;
-  bool                 _isWifiEthConnected;
+    private:
+        BoardConfig const   *m_boardConfig;
+        Configuration const *m_userConfig;
+        TaskManager          m_taskManager;
+        Display              m_display;
+        bool                 m_isWifiEthConnected;
 };
 
 #endif

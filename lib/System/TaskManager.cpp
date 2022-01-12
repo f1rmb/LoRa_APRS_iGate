@@ -2,75 +2,99 @@
 #include <FontConfig.h>
 #include <logger.h>
 
-TaskManager::TaskManager() {
+TaskManager::TaskManager()
+{
 }
 
-void TaskManager::addTask(Task *task) {
-  _tasks.push_back(task);
+void TaskManager::addTask(Task *task)
+{
+    m_tasks.push_back(task);
 }
 
-void TaskManager::addAlwaysRunTask(Task *task) {
-  _alwaysRunTasks.push_back(task);
+void TaskManager::addAlwaysRunTask(Task *task)
+{
+    m_alwaysRunTasks.push_back(task);
 }
 
-std::list<Task *> TaskManager::getTasks() {
-  std::list<Task *> tasks = _alwaysRunTasks;
-  std::copy(_tasks.begin(), _tasks.end(), std::back_inserter(tasks));
-  return tasks;
+std::list<Task *> TaskManager::getTasks()
+        {
+    std::list<Task *> tasks = m_alwaysRunTasks;
+    std::copy(m_tasks.begin(), m_tasks.end(), std::back_inserter(tasks));
+
+    return tasks;
 }
 
-bool TaskManager::setup(System &system) {
-  logPrintlnV("will setup all tasks...");
-  for (Task *elem : _alwaysRunTasks) {
-    logPrintD("call setup from ");
-    logPrintlnD(elem->getName());
-    elem->setup(system);
-  }
-  for (Task *elem : _tasks) {
-    logPrintD("call setup from ");
-    logPrintlnD(elem->getName());
-    elem->setup(system);
-  }
-  _nextTask = _tasks.begin();
-  return true;
+bool TaskManager::setup(System &system)
+{
+    logPrintlnV("will setup all tasks...");
+    for (Task *elem : m_alwaysRunTasks)
+    {
+        logPrintD("call setup from ");
+        logPrintlnD(elem->getName());
+        elem->setup(system);
+    }
+
+    for (Task *elem : m_tasks)
+    {
+        logPrintD("call setup from ");
+        logPrintlnD(elem->getName());
+        elem->setup(system);
+    }
+
+    m_nextTask = m_tasks.begin();
+    return true;
 }
 
-bool TaskManager::loop(System &system) {
-  // logPrintlnD("will loop all tasks...");
-  for (Task *elem : _alwaysRunTasks) {
-    // logPrintD("call loop from ");
-    // logPrintlnD(elem->getName());
-    elem->loop(system);
-  }
+bool TaskManager::loop(System &system)
+{
+    // logPrintlnD("will loop all tasks...");
+    for (Task *elem : m_alwaysRunTasks)
+    {
+        // logPrintD("call loop from ");
+        // logPrintlnD(elem->getName());
+        elem->loop(system);
+    }
 
-  if (_nextTask == _tasks.end()) {
-    _nextTask = _tasks.begin();
-  }
-  bool ret = (*_nextTask)->loop(system);
-  ++_nextTask;
-  return ret;
+    if (m_nextTask == m_tasks.end())
+    {
+        m_nextTask = m_tasks.begin();
+    }
+
+    bool ret = (*m_nextTask)->loop(system);
+    ++m_nextTask;
+
+    return ret;
 }
 
 // cppcheck-suppress unusedFunction
-void StatusFrame::drawStatusPage(Bitmap &bitmap) {
-  int y = 0;
-  for (Task *task : _tasks) {
-    int x = bitmap.drawString(0, y, false, (task->getName()).substring(0, task->getName().indexOf("Task")));
-    x     = bitmap.drawString(x, y, false, ":  ");
-    if (task->getStateInfo().length() == 0) {
-      switch (task->getState()) {
-      case Error:
-        bitmap.drawString(x, y, false, "Error");
-        break;
-      case Warning:
-        bitmap.drawString(x, y, false, "Warning");
-      default:
-        break;
-      }
-      bitmap.drawString(x, y, false, "Okay");
-    } else {
-      bitmap.drawString(x, y, false, task->getStateInfo());
+void StatusFrame::drawStatusPage(Bitmap &bitmap)
+{
+    int y = 0;
+
+    for (Task *task : m_tasks)
+    {
+        int x = bitmap.drawString(0, y, false, (task->getName()).substring(0, task->getName().indexOf("Task")));
+        x     = bitmap.drawString(x, y, false, ":  ");
+
+        if (task->getStateInfo().length() == 0)
+        {
+            switch (task->getState())
+            {
+                case Error:
+                    bitmap.drawString(x, y, false, "Error");
+                    break;
+                case Warning:
+                    bitmap.drawString(x, y, false, "Warning");
+                default:
+                    break;
+            }
+            bitmap.drawString(x, y, false, "Okay");
+        }
+        else
+        {
+            bitmap.drawString(x, y, false, task->getStateInfo());
+        }
+
+        y += (getSystemFont()->heightInPixel + 1);
     }
-    y += (getSystemFont()->heightInPixel + 1);
-  }
 }

@@ -1,40 +1,53 @@
 
 #include "System.h"
 
-System::System() : _boardConfig(0), _userConfig(0), _isWifiEthConnected(false) {
+System::System() :
+m_boardConfig(0),
+m_userConfig(0),
+m_isWifiEthConnected(false)
+{
 }
 
-System::~System() {
+System::~System()
+{
 }
 
-void System::setBoardConfig(BoardConfig const *const boardConfig) {
-  _boardConfig = boardConfig;
+void System::setBoardConfig(BoardConfig const *const boardConfig)
+{
+    m_boardConfig = boardConfig;
 }
 
-void System::setUserConfig(Configuration const *const userConfig) {
-  _userConfig = userConfig;
+void System::setUserConfig(Configuration const *const userConfig)
+{
+    m_userConfig = userConfig;
 }
 
-BoardConfig const *const System::getBoardConfig() const {
-  return _boardConfig;
+BoardConfig const *const System::getBoardConfig() const
+{
+    return m_boardConfig;
 }
 
-Configuration const *const System::getUserConfig() const {
-  return _userConfig;
+Configuration const *const System::getUserConfig() const
+{
+    return m_userConfig;
 }
 
-TaskManager &System::getTaskManager() {
-  return _taskManager;
+TaskManager &System::getTaskManager()
+{
+    return m_taskManager;
 }
 
-Display &System::getDisplay() {
-  return _display;
+Display &System::getDisplay()
+{
+    return m_display;
 }
 
-bool System::isWifiEthConnected() const {
-  return _isWifiEthConnected;
+bool System::isWifiEthConnected() const
+{
+    return m_isWifiEthConnected;
 }
 
-void System::connectedViaWifiEth(bool status) {
-  _isWifiEthConnected = status;
+void System::connectedViaWifiEth(bool status)
+{
+    m_isWifiEthConnected = status;
 }

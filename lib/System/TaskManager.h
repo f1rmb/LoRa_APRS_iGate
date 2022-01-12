@@ -15,75 +15,96 @@ class System;
 
 enum TaskDisplayState
 {
-  Error,
-  Warning,
-  Okay,
+    Error,
+    Warning,
+    Okay,
 };
 
-class Task {
-public:
-  Task(String &name, int taskId) : _state(Okay), _stateInfo("Booting"), _name(name), _taskId(taskId) {
-  }
-  Task(const char *name, int taskId) : _state(Okay), _stateInfo("Booting"), _name(name), _taskId(taskId) {
-  }
-  virtual ~Task() {
-  }
+class Task
+{
+    public:
+        Task(String &name, int taskId) :
+            m_state(Okay),
+            m_stateInfo("Booting"),
+            m_name(name),
+            m_taskId(taskId)
+        {
+        }
+        Task(const char *name, int taskId) :
+            m_state(Okay),
+            m_stateInfo("Booting"),
+            m_name(name),
+            m_taskId(taskId)
+        {
+        }
+        virtual ~Task()
+        {
+        }
 
-  String getName() const {
-    return _name;
-  }
-  int getTaskId() const {
-    return _taskId;
-  }
+        String getName() const
+        {
+            return m_name;
+        }
+        int getTaskId() const
+        {
+            return m_taskId;
+        }
 
-  TaskDisplayState getState() const {
-    return _state;
-  }
-  String getStateInfo() const {
-    return _stateInfo;
-  }
+        TaskDisplayState getState() const
+        {
+            return m_state;
+        }
+        String getStateInfo() const
+        {
+            return m_stateInfo;
+        }
 
-  virtual bool setup(System &system) = 0;
-  virtual bool loop(System &system)  = 0;
+        virtual bool setup(System &system) = 0;
+        virtual bool loop(System &system)  = 0;
 
-protected:
-  TaskDisplayState _state;
-  String           _stateInfo;
+    protected:
+        TaskDisplayState m_state;
+        String           m_stateInfo;
 
-private:
-  String _name;
-  int    _taskId;
+    private:
+        String m_name;
+        int    m_taskId;
 };
 
-class TaskManager {
-public:
-  TaskManager();
-  ~TaskManager() {
-  }
+class TaskManager
+{
+    public:
+        TaskManager();
+        ~TaskManager()
+        {
+        }
 
-  void              addTask(Task *task);
-  void              addAlwaysRunTask(Task *task);
-  std::list<Task *> getTasks();
+        void              addTask(Task *task);
+        void              addAlwaysRunTask(Task *task);
+        std::list<Task *> getTasks();
 
-  bool setup(System &system);
-  bool loop(System &system);
+        bool setup(System &system);
+        bool loop(System &system);
 
-private:
-  std::list<Task *>           _tasks;
-  std::list<Task *>::iterator _nextTask;
-  std::list<Task *>           _alwaysRunTasks;
+    private:
+        std::list<Task *>           m_tasks;
+        std::list<Task *>::iterator m_nextTask;
+        std::list<Task *>           m_alwaysRunTasks;
 };
 
-class StatusFrame : public DisplayFrame {
-public:
-  explicit StatusFrame(const std::list<Task *> &tasks) : _tasks(tasks) {
-  }
-  virtual ~StatusFrame() {
-  }
-  void drawStatusPage(Bitmap &bitmap) override;
+class StatusFrame : public DisplayFrame
+{
+    public:
+        explicit StatusFrame(const std::list<Task *> &tasks) : m_tasks(tasks)
+        {
+        }
+        virtual ~StatusFrame()
+        {
+        }
+        void drawStatusPage(Bitmap &bitmap) override;
 
-private:
-  std::list<Task *> _tasks;
+    private:
+        std::list<Task *> m_tasks;
 };
 
 #include "System.h"

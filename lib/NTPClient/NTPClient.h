@@ -7,100 +7,100 @@
 #define NTP_PACKET_SIZE 48
 #define NTP_DEFAULT_LOCAL_PORT 1337
 
-class NTPClient {
-  private:
-    WiFiUDP       _udp;
-    bool          _udpSetup       = false;
+class NTPClient
+{
+    public:
+        NTPClient();
+        explicit NTPClient(long timeOffset);
+        explicit NTPClient(const char* poolServerName);
+        NTPClient(const char* poolServerName, long timeOffset);
+        NTPClient(const char* poolServerName, long timeOffset, unsigned long updateInterval);
+        explicit NTPClient(IPAddress poolServerIP);
+        NTPClient(IPAddress poolServerIP, long timeOffset);
+        NTPClient(IPAddress poolServerIP, long timeOffset, unsigned long updateInterval);
 
-    const char*   _poolServerName = "pool.ntp.org"; // Default time server
-    IPAddress     _poolServerIP;
-    unsigned int  _port           = NTP_DEFAULT_LOCAL_PORT;
-    long          _timeOffset     = 0;
+        /**
+         * Set time server name
+         *
+         * @param poolServerName
+         */
+        void setPoolServerName(const char* poolServerName);
 
-    unsigned long _updateInterval = 60000;  // In ms
+        /**
+         * Set random local port
+         */
+        void setRandomPort(unsigned int minValue = 49152, unsigned int maxValue = 65535);
 
-    unsigned long _currentEpoc    = 0;      // In s
-    unsigned long _lastUpdate     = 0;      // In ms
+        /**
+         * Starts the underlying UDP client with the default local port
+         */
+        void begin();
 
-    byte          _packetBuffer[NTP_PACKET_SIZE];
+        /**
+         * Starts the underlying UDP client with the specified local port
+         */
+        void begin(unsigned int port);
 
-    void          sendNTPPacket();
+        /**
+         * This should be called in the main loop of your application. By default an update from the NTP Server is only
+         * made every 60 seconds. This can be configured in the NTPClient constructor.
+         *
+         * @return true on success, false on failure
+         */
+        bool update();
 
-  public:
-    NTPClient();
-    explicit NTPClient(long timeOffset);
-    explicit NTPClient(const char* poolServerName);
-    NTPClient(const char* poolServerName, long timeOffset);
-    NTPClient(const char* poolServerName, long timeOffset, unsigned long updateInterval);
-    explicit NTPClient(IPAddress poolServerIP);
-    NTPClient(IPAddress poolServerIP, long timeOffset);
-    NTPClient(IPAddress poolServerIP, long timeOffset, unsigned long updateInterval);
+        /**
+         * This will force the update from the NTP Server.
+         *
+         * @return true on success, false on failure
+         */
+        bool forceUpdate();
 
-    /**
-     * Set time server name
-     *
-     * @param poolServerName
-     */
-    void setPoolServerName(const char* poolServerName);
+        int getDay() const;
+        int getHours() const;
+        int getMinutes() const;
+        int getSeconds() const;
 
-     /**
-     * Set random local port
-     */
-    void setRandomPort(unsigned int minValue = 49152, unsigned int maxValue = 65535);
+        /**
+         * Changes the time offset. Useful for changing timezones dynamically
+         */
+        void setTimeOffset(int timeOffset);
 
-    /**
-     * Starts the underlying UDP client with the default local port
-     */
-    void begin();
+        /**
+         * Set the update interval to another frequency. E.g. useful when the
+         * timeOffset should not be set in the constructor
+         */
+        void setUpdateInterval(unsigned long updateInterval);
 
-    /**
-     * Starts the underlying UDP client with the specified local port
-     */
-    void begin(unsigned int port);
+        /**
+         * @return time formatted like `hh:mm:ss`
+         */
+        String getFormattedTime() const;
 
-    /**
-     * This should be called in the main loop of your application. By default an update from the NTP Server is only
-     * made every 60 seconds. This can be configured in the NTPClient constructor.
-     *
-     * @return true on success, false on failure
-     */
-    bool update();
+        /**
+         * @return time in seconds since Jan. 1, 1970
+         */
+        unsigned long getEpochTime() const;
 
-    /**
-     * This will force the update from the NTP Server.
-     *
-     * @return true on success, false on failure
-     */
-    bool forceUpdate();
+        /**
+         * Stops the underlying UDP client
+         */
+        void end();
 
-    int getDay() const;
-    int getHours() const;
-    int getMinutes() const;
-    int getSeconds() const;
+    private:
+        void          sendNTPPacket();
 
-    /**
-     * Changes the time offset. Useful for changing timezones dynamically
-     */
-    void setTimeOffset(int timeOffset);
+    private:
+        WiFiUDP       m_udp;
+        bool          m_udpSetup;
+        const char*   m_poolServerName; // Default time server: pool.ntp.org
+        IPAddress     m_poolServerIP;
+        unsigned int  m_port;
+        long          m_timeOffset;
+        unsigned long m_updateInterval; // In ms
+        unsigned long m_currentEpoc;    // In s
+        unsigned long m_lastUpdate;     // In ms
+        byte          m_packetBuffer[NTP_PACKET_SIZE];
 
-    /**
-     * Set the update interval to another frequency. E.g. useful when the
-     * timeOffset should not be set in the constructor
-     */
-    void setUpdateInterval(unsigned long updateInterval);
 
-    /**
-     * @return time formatted like `hh:mm:ss`
-     */
-    String getFormattedTime() const;
-
-    /**
-     * @return time in seconds since Jan. 1, 1970
-     */
-    unsigned long getEpochTime() const;
-
-    /**
-     * Stops the underlying UDP client
-     */
-    void end();
 };

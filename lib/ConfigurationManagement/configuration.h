@@ -11,19 +11,21 @@
 
 class Configuration;
 
-class ConfigurationManagement {
-public:
-  explicit ConfigurationManagement(String FilePath);
-  virtual ~ConfigurationManagement();
+class ConfigurationManagement
+{
+    public:
+        explicit ConfigurationManagement(String FilePath);
+        virtual ~ConfigurationManagement();
 
-  void readConfiguration(Configuration &conf);
-  void writeConfiguration(Configuration &conf);
+        void readConfiguration(Configuration &conf);
+        void writeConfiguration(Configuration &conf);
 
-private:
-  virtual void readProjectConfiguration(DynamicJsonDocument &data, Configuration &conf)  = 0;
-  virtual void writeProjectConfiguration(Configuration &conf, DynamicJsonDocument &data) = 0;
+    private:
+        virtual void readProjectConfiguration(DynamicJsonDocument &data, Configuration &conf)  = 0;
+        virtual void writeProjectConfiguration(Configuration &conf, DynamicJsonDocument &data) = 0;
 
-  const String mFilePath;
+    private:
+        const String m_FilePath;
 };
 
 #endif

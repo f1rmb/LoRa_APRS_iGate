@@ -1,11 +1,11 @@
 /*
   time.h - low level time and date functions
-*/
+ */
 
 /*
   July 3 2011 - fixed elapsedSecsThisWeek macro (thanks Vincent Valdy for this)
               - fixed  daysToTime_t macro (thanks maniacbug)
-*/     
+ */
 
 #ifndef _Time_h
 #define _Time_h
@@ -13,26 +13,48 @@
 #include <inttypes.h>
 #include <Arduino.h>
 
-typedef enum {timeNotSet, timeNeedsSync, timeSet
-}  timeStatus_t ;
+typedef enum
+{
+    timeNotSet,
+    timeNeedsSync,
+    timeSet
+}  timeStatus_t;
 
-typedef enum {
-    dowInvalid, dowSunday, dowMonday, dowTuesday, dowWednesday, dowThursday, dowFriday, dowSaturday
+typedef enum
+{
+    dowInvalid,
+    dowSunday,
+    dowMonday,
+    dowTuesday,
+    dowWednesday,
+    dowThursday,
+    dowFriday,
+    dowSaturday
 } timeDayOfWeek_t;
 
-typedef enum {
-    tmSecond, tmMinute, tmHour, tmWday, tmDay,tmMonth, tmYear, tmNbrFields
+typedef enum
+{
+    tmSecond,
+    tmMinute,
+    tmHour,
+    tmWday,
+    tmDay,
+    tmMonth,
+    tmYear,
+    tmNbrFields
 } tmByteFields;	   
 
-typedef struct  { 
-  uint8_t Second; 
-  uint8_t Minute; 
-  uint8_t Hour; 
-  uint8_t Wday;   // day of week, sunday is day 1
-  uint8_t Day;
-  uint8_t Month; 
-  uint8_t Year;   // offset from 1970; 
-} 	tmElements_t, TimeElements, *tmElementsPtr_t;
+typedef struct
+{
+        uint8_t Second;
+        uint8_t Minute;
+        uint8_t Hour;
+        uint8_t Wday;   // day of week, sunday is day 1
+        uint8_t Day;
+        uint8_t Month;
+        uint8_t Year;   // offset from 1970;
+}
+tmElements_t, TimeElements, *tmElementsPtr_t;
 
 //convenience macros to convert to and from tm years 
 #define  tmYearToCalendar(Y) ((Y) + 1970)  // full four digit year 
@@ -53,7 +75,7 @@ typedef time_t(*getExternalTime)();
 #define SECS_PER_WEEK ((time_t)(SECS_PER_DAY * DAYS_PER_WEEK))
 #define SECS_PER_YEAR ((time_t)(SECS_PER_DAY * 365UL)) // TODO: ought to handle leap years
 #define SECS_YR_2000  ((time_t)(946684800UL)) // the time at the start of y2k
- 
+
 /* Useful Macros for getting elapsed time */
 #define numberOfSeconds(_time_) ((_time_) % SECS_PER_MIN)  
 #define numberOfMinutes(_time_) (((_time_) / SECS_PER_MIN) % SECS_PER_MIN) 
@@ -113,7 +135,7 @@ const String monthStr(uint8_t month);
 const String dayStr(uint8_t day);
 const String monthShortStr(uint8_t month);
 const String dayShortStr(uint8_t day);
-	
+
 /* time sync functions	*/
 timeStatus_t timeStatus(); // indicates if time has been set and recently synchronized
 void    setSyncProvider( getExternalTime getTimeFunction); // identify the external time provider
