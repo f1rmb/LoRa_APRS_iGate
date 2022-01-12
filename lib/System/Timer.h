@@ -1,23 +1,22 @@
 #ifndef TIMER_H_
 #define TIMER_H_
 
-class Timer {
-public:
-  Timer();
+class Timer
+{
+    public:
+        Timer();
 
-  void     setTimeout(const uint32_t timeout_ms);
-  uint32_t getTriggerTimeInSec() const;
+        void          setTimeout(const unsigned long timeout_ms);
+        unsigned long getRemainingInSecs() const;
 
-  bool isActive() const;
+        bool          isRunning() const;
+        bool          hasExpired();
+        void          start();
+        void          stop();
 
-  void reset();
-
-  bool check();
-  void start();
-
-private:
-  uint32_t _timeout_ms;
-  uint32_t _nextTimeout;
+    private:
+        unsigned long m_timeout_ms;
+        unsigned long m_nextTimeout;
 };
 
 #endif

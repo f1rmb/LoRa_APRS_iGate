@@ -2,31 +2,46 @@
 
 #include "Timer.h"
 
-Timer::Timer() : _timeout_ms(0), _nextTimeout(0) {
+Timer::Timer() :
+m_timeout_ms(0UL),
+m_nextTimeout(0UL)
+{
 }
 
-void Timer::setTimeout(const uint32_t timeout_ms) {
-  _timeout_ms = timeout_ms;
+void Timer::setTimeout(const unsigned long timeout_ms)
+{
+    m_timeout_ms = timeout_ms;
 }
 
-uint32_t Timer::getTriggerTimeInSec() const {
-  return (_nextTimeout - millis()) / 1000;
+unsigned long Timer::getRemainingInSecs() const
+{
+    if (m_nextTimeout == 0UL)
+    {
+        return 0UL;
+    }
+
+    return (m_nextTimeout - millis()) / 1000;
 }
 
 // cppcheck-suppress unusedFunction
-bool Timer::isActive() const {
-  return _nextTimeout != 0;
+bool Timer::isRunning() const
+{
+    return (m_nextTimeout > 0UL);
+}
+
+bool Timer::hasExpired()
+{
+    return (millis() > m_nextTimeout);
+}
+
+void Timer::start()
+{
+    m_nextTimeout = (millis() + m_timeout_ms);
 }
 
 // cppcheck-suppress unusedFunction
-void Timer::reset() {
-  _nextTimeout = 0;
+void Timer::stop()
+{
+    m_nextTimeout = 0UL;
 }
 
-bool Timer::check() {
-  return millis() > _nextTimeout;
-}
-
-void Timer::start() {
-  _nextTimeout = millis() + _timeout_ms;
-}
