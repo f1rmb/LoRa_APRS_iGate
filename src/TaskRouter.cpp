@@ -77,7 +77,7 @@ bool RouterTask::loop(System &system) {
   }
 
   // check for beacon
-  if (_beacon_timer.check()) {
+  if (_beacon_timer.hasExpired()) {
     logPrintD("[" + timeString() + "] ");
     logPrintlnD(_beaconMsg->encode());
 
@@ -93,7 +93,7 @@ bool RouterTask::loop(System &system) {
     _beacon_timer.start();
   }
 
-  uint32_t diff = _beacon_timer.getTriggerTimeInSec();
+  unsigned long diff = _beacon_timer.getRemainingInSecs();
   _stateInfo    = "beacon " + String(uint32_t(diff / 600)) + String(uint32_t(diff / 60) % 10) + ":" + String(uint32_t(diff / 10) % 6) + String(uint32_t(diff % 10));
 
   return true;
