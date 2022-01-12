@@ -55,22 +55,22 @@ bool TaskManager::loop(System &system) {
 void StatusFrame::drawStatusPage(Bitmap &bitmap) {
   int y = 0;
   for (Task *task : _tasks) {
-    int x = bitmap.drawString(0, y, (task->getName()).substring(0, task->getName().indexOf("Task")));
-    x     = bitmap.drawString(x, y, ": ");
-    if (task->getStateInfo() == "") {
+    int x = bitmap.drawString(0, y, false, (task->getName()).substring(0, task->getName().indexOf("Task")));
+    x     = bitmap.drawString(x, y, false, ":  ");
+    if (task->getStateInfo().length() == 0) {
       switch (task->getState()) {
       case Error:
-        bitmap.drawString(x, y, "Error");
+        bitmap.drawString(x, y, false, "Error");
         break;
       case Warning:
-        bitmap.drawString(x, y, "Warning");
+        bitmap.drawString(x, y, false, "Warning");
       default:
         break;
       }
-      bitmap.drawString(x, y, "Okay");
+      bitmap.drawString(x, y, false, "Okay");
     } else {
-      bitmap.drawString(x, y, task->getStateInfo());
+      bitmap.drawString(x, y, false, task->getStateInfo());
     }
-    y += getSystemFont()->heightInPixel;
+    y += (getSystemFont()->heightInPixel + 1);
   }
 }
