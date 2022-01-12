@@ -6,31 +6,43 @@
 #include "TaskNTP.h"
 #include "project_configuration.h"
 
-NTPTask::NTPTask() : Task(TASK_NTP, TaskNtp), _beginCalled(false) {
+NTPTask::NTPTask() :
+Task(TASK_NTP, TaskNtp),
+m_beginCalled(false)
+{
 }
 
-NTPTask::~NTPTask() {
+NTPTask::~NTPTask()
+{
 }
 
-bool NTPTask::setup(System &system) {
-  _ntpClient.setPoolServerName(system.getUserConfig()->ntpServer.c_str());
-  return true;
+bool NTPTask::setup(System &system)
+{
+    m_ntpClient.setPoolServerName(system.getUserConfig()->ntpServer.c_str());
+    return true;
 }
 
-bool NTPTask::loop(System &system) {
-  if (!system.isWifiEthConnected()) {
-    return false;
-  }
-  if (!_beginCalled) {
-    _ntpClient.begin();
-    _beginCalled = true;
-  }
-  if (_ntpClient.update()) {
-    setTime(_ntpClient.getEpochTime());
-    logPrintI("Current time: ");
-    logPrintlnI(_ntpClient.getFormattedTime());
-  }
-  _stateInfo = _ntpClient.getFormattedTime();
-  _state     = Okay;
-  return true;
+bool NTPTask::loop(System &system)
+{
+    if (!system.isWifiEthConnected())
+    {
+        return false;
+    }
+
+    if (!m_beginCalled)
+    {
+        m_ntpClient.begin();
+        m_beginCalled = true;
+    }
+
+    if (m_ntpClient.update())
+    {
+        setTime(m_ntpClient.getEpochTime());
+        logPrintI("Current time: ");
+        logPrintlnI(m_ntpClient.getFormattedTime());
+    }
+
+    m_stateInfo = m_ntpClient.getFormattedTime();
+    m_state     = Okay;
+    return true;
 }

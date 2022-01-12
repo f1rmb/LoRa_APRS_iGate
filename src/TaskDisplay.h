@@ -4,13 +4,14 @@
 #include <Display.h>
 #include <TaskManager.h>
 
-class DisplayTask : public Task {
-public:
-  DisplayTask();
-  virtual ~DisplayTask();
+class DisplayTask : public Task
+{
+    public:
+        DisplayTask();
+        virtual ~DisplayTask();
 
-  virtual bool setup(System &system) override;
-  virtual bool loop(System &system) override;
+        virtual bool setup(System &system) override;
+        virtual bool loop(System &system) override;
 };
 
 #endif

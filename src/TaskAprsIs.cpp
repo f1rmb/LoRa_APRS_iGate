@@ -4,51 +4,67 @@
 #include "TaskAprsIs.h"
 #include "project_configuration.h"
 
-AprsIsTask::AprsIsTask(TaskQueue<std::shared_ptr<APRSMessage>> &toAprsIs) : Task(TASK_APRS_IS, TaskAprsIs), _toAprsIs(toAprsIs) {
+AprsIsTask::AprsIsTask(TaskQueue<std::shared_ptr<APRSMessage>> &toAprsIs) :
+Task(TASK_APRS_IS, TaskAprsIs),
+m_toAprsIs(toAprsIs)
+{
 }
 
-AprsIsTask::~AprsIsTask() {
+AprsIsTask::~AprsIsTask()
+{
 }
 
-bool AprsIsTask::setup(System &system) {
-  _aprs_is.setup(system.getUserConfig()->callsign, system.getUserConfig()->aprs_is.passcode, "ESP32-APRS-IS", "0.2");
-  return true;
+bool AprsIsTask::setup(System &system)
+{
+    m_aprs_is.setup(system.getUserConfig()->callsign, system.getUserConfig()->aprs_is.passcode, "ESP32-APRS-IS", "0.2");
+    return true;
 }
 
-bool AprsIsTask::loop(System &system) {
-  if (!system.isWifiEthConnected()) {
-    return false;
-  }
-  if (!_aprs_is.connected()) {
-    if (!connect(system)) {
-      _stateInfo = "not connected";
-      _state     = Error;
-      return false;
+bool AprsIsTask::loop(System &system)
+{
+    if (!system.isWifiEthConnected())
+    {
+        return false;
     }
-    _stateInfo = "connected";
-    _state     = Okay;
-    return false;
-  }
 
-  _aprs_is.getAPRSMessage();
+    if (!m_aprs_is.connected())
+    {
+        if (!connect(system))
+        {
+            m_stateInfo = "not connected";
+            m_state     = Error;
+            return false;
+        }
 
-  if (!_toAprsIs.empty()) {
-    std::shared_ptr<APRSMessage> msg = _toAprsIs.getElement();
-    _aprs_is.sendMessage(msg);
-  }
+        m_stateInfo = "connected";
+        m_state     = Okay;
+        return false;
+    }
 
-  return true;
+    m_aprs_is.getAPRSMessage();
+
+    if (!m_toAprsIs.empty())
+    {
+        std::shared_ptr<APRSMessage> msg = m_toAprsIs.getElement();
+        m_aprs_is.sendMessage(msg);
+    }
+
+    return true;
 }
 
-bool AprsIsTask::connect(const System &system) {
-  logPrintI("connecting to APRS-IS server: ");
-  logPrintI(system.getUserConfig()->aprs_is.server);
-  logPrintI(" on port: ");
-  logPrintlnI(String(system.getUserConfig()->aprs_is.port));
-  if (!_aprs_is.connect(system.getUserConfig()->aprs_is.server, system.getUserConfig()->aprs_is.port)) {
-    logPrintlnE("Connection failed.");
-    return false;
-  }
-  logPrintlnI("Connected to APRS-IS server!");
-  return true;
+bool AprsIsTask::connect(const System &system)
+{
+    logPrintI("connecting to APRS-IS server: ");
+    logPrintI(system.getUserConfig()->aprs_is.server);
+    logPrintI(" on port: ");
+    logPrintlnI(String(system.getUserConfig()->aprs_is.port));
+
+    if (!m_aprs_is.connect(system.getUserConfig()->aprs_is.server, system.getUserConfig()->aprs_is.port))
+    {
+        logPrintlnE("Connection failed.");
+        return false;
+    }
+
+    logPrintlnI("Connected to APRS-IS server!");
+    return true;
 }

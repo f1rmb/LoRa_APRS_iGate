@@ -4,17 +4,18 @@
 #include <TaskManager.h>
 #include <WiFiMulti.h>
 
-class WifiTask : public Task {
-public:
-  WifiTask();
-  virtual ~WifiTask();
+class WifiTask : public Task
+{
+    public:
+        WifiTask();
+        virtual ~WifiTask();
 
-  virtual bool setup(System &system) override;
-  virtual bool loop(System &system) override;
+        virtual bool setup(System &system) override;
+        virtual bool loop(System &system) override;
 
-private:
-  WiFiMulti _wiFiMulti;
-  uint8_t   _oldWifiStatus;
+    private:
+        WiFiMulti m_wiFiMulti;
+        uint8_t   m_oldWifiStatus;
 };
 
 #endif

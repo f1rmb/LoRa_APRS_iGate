@@ -3,15 +3,15 @@
 
 enum TaskNames
 {
-  TaskAprsIs = 1,
-  TaskEth,
-  TaskFtp,
-  TaskModem,
-  TaskNtp,
-  TaskOta,
-  TaskWifi,
-  TaskRouter,
-  TaskSize,
+    TaskAprsIs = 1,
+    TaskEth,
+    TaskFtp,
+    TaskModem,
+    TaskNtp,
+    TaskOta,
+    TaskWifi,
+    TaskRouter,
+    TaskSize,
 };
 
 #define TASK_APRS_IS "AprsIsTask"

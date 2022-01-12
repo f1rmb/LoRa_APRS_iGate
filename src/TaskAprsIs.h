@@ -6,20 +6,22 @@
 #include <TaskManager.h>
 #include <Timer.h>
 
-class AprsIsTask : public Task {
-public:
-  explicit AprsIsTask(TaskQueue<std::shared_ptr<APRSMessage>> &toAprsIs);
-  virtual ~AprsIsTask();
+class AprsIsTask : public Task
+{
+    public:
+        explicit AprsIsTask(TaskQueue<std::shared_ptr<APRSMessage>> &toAprsIs);
+        virtual ~AprsIsTask();
 
-  virtual bool setup(System &system) override;
-  virtual bool loop(System &system) override;
+        virtual bool setup(System &system) override;
+        virtual bool loop(System &system) override;
 
-private:
-  APRS_IS _aprs_is;
+    private:
+        bool connect(const System &system);
 
-  TaskQueue<std::shared_ptr<APRSMessage>> &_toAprsIs;
+    private:
+        APRS_IS                                  m_aprs_is;
+        TaskQueue<std::shared_ptr<APRSMessage>> &m_toAprsIs;
 
-  bool connect(const System &system);
 };
 
 #endif

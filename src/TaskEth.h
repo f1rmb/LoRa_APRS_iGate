@@ -5,15 +5,16 @@
 
 void WiFiEvent(WiFiEvent_t event);
 
-class EthTask : public Task {
-public:
-  EthTask();
-  virtual ~EthTask();
+class EthTask : public Task
+{
+    public:
+        EthTask();
+        virtual ~EthTask();
 
-  virtual bool setup(System &system) override;
-  virtual bool loop(System &system) override;
+        virtual bool setup(System &system) override;
+        virtual bool loop(System &system) override;
 
-private:
+    private:
 };
 
 #endif

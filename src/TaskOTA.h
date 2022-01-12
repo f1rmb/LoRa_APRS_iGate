@@ -4,17 +4,18 @@
 #include <ArduinoOTA.h>
 #include <TaskManager.h>
 
-class OTATask : public Task {
-public:
-  OTATask();
-  virtual ~OTATask();
+class OTATask : public Task
+{
+    public:
+        OTATask();
+        virtual ~OTATask();
 
-  virtual bool setup(System &system) override;
-  virtual bool loop(System &system) override;
+        virtual bool setup(System &system) override;
+        virtual bool loop(System &system) override;
 
-private:
-  ArduinoOTAClass _ota;
-  bool            _beginCalled;
+    private:
+        ArduinoOTAClass m_ota;
+        bool            m_beginCalled;
 };
 
 #endif

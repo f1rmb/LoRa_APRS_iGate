@@ -9,92 +9,118 @@
 String create_lat_aprs(double lat);
 String create_long_aprs(double lng);
 
-RouterTask::RouterTask(TaskQueue<std::shared_ptr<APRSMessage>> &fromModem, TaskQueue<std::shared_ptr<APRSMessage>> &toModem, TaskQueue<std::shared_ptr<APRSMessage>> &toAprsIs) : Task(TASK_ROUTER, TaskRouter), _fromModem(fromModem), _toModem(toModem), _toAprsIs(toAprsIs) {
+RouterTask::RouterTask(TaskQueue<std::shared_ptr<APRSMessage>> &fromModem, TaskQueue<std::shared_ptr<APRSMessage>> &toModem, TaskQueue<std::shared_ptr<APRSMessage>> &toAprsIs) :
+Task(TASK_ROUTER, TaskRouter),
+m_fromModem(fromModem),
+m_toModem(toModem),
+m_toAprsIs(toAprsIs)
+{
 }
 
-RouterTask::~RouterTask() {
+RouterTask::~RouterTask()
+{
 }
 
-bool RouterTask::setup(System &system) {
-  // setup beacon
-  _beacon_timer.setTimeout(system.getUserConfig()->beacon.timeout * 60 * 1000);
+bool RouterTask::setup(System &system)
+{
+    // setup beacon
+    m_beacon_timer.setTimeout(system.getUserConfig()->beacon.timeout * 60 * 1000);
 
-  _beaconMsg = std::shared_ptr<APRSMessage>(new APRSMessage());
-  _beaconMsg->setSource(system.getUserConfig()->callsign);
-  _beaconMsg->setDestination("APLG01");
-  String lat = create_lat_aprs(system.getUserConfig()->beacon.positionLatitude);
-  String lng = create_long_aprs(system.getUserConfig()->beacon.positionLongitude);
-  _beaconMsg->getBody()->setData(String("=") + lat + "L" + lng + "&" + system.getUserConfig()->beacon.message);
+    m_beaconMsg = std::shared_ptr<APRSMessage>(new APRSMessage());
+    m_beaconMsg->setSource(system.getUserConfig()->callsign);
+    m_beaconMsg->setDestination("APLG01");
+    String lat = create_lat_aprs(system.getUserConfig()->beacon.positionLatitude);
+    String lng = create_long_aprs(system.getUserConfig()->beacon.positionLongitude);
+    m_beaconMsg->getBody()->setData(String("=") + lat + "L" + lng + "&" + system.getUserConfig()->beacon.message);
 
-  return true;
+    return true;
 }
 
-bool RouterTask::loop(System &system) {
-  // do routing
-  if (!_fromModem.empty()) {
-    std::shared_ptr<APRSMessage> modemMsg = _fromModem.getElement();
+bool RouterTask::loop(System &system)
+{
+    // do routing
+    if (!m_fromModem.empty())
+    {
+        std::shared_ptr<APRSMessage> modemMsg = m_fromModem.getElement();
 
-    if (system.getUserConfig()->aprs_is.active && modemMsg->getSource() != system.getUserConfig()->callsign) {
-      std::shared_ptr<APRSMessage> aprsIsMsg = std::make_shared<APRSMessage>(*modemMsg);
-      String                       path      = aprsIsMsg->getPath();
+        if (system.getUserConfig()->aprs_is.active && modemMsg->getSource() != system.getUserConfig()->callsign)
+        {
+            std::shared_ptr<APRSMessage> aprsIsMsg = std::make_shared<APRSMessage>(*modemMsg);
+            String                       path      = aprsIsMsg->getPath();
 
-      if (!(path.indexOf("RFONLY") != -1 || path.indexOf("NOGATE") != -1 || path.indexOf("TCPIP") != -1)) {
-        if (!path.isEmpty()) {
-          path += ",";
+            if (((path.indexOf("RFONLY") != -1) || (path.indexOf("NOGATE") != -1) || (path.indexOf("TCPIP") != -1)) == false)
+            {
+                if (!path.isEmpty())
+                {
+                    path += ",";
+                }
+
+                aprsIsMsg->setPath(path + "qAR," + system.getUserConfig()->callsign);
+
+                logPrintD("APRS-IS: ");
+                logPrintlnD(aprsIsMsg->toString());
+                m_toAprsIs.addElement(aprsIsMsg);
+            }
+            else
+            {
+                logPrintlnD("APRS-IS: no forward => RFonly");
+            }
+        }
+        else
+        {
+            if (!system.getUserConfig()->aprs_is.active)
+            {
+                logPrintlnD("APRS-IS: disabled");
+            }
+
+            if (modemMsg->getSource() == system.getUserConfig()->callsign)
+            {
+                logPrintlnD("APRS-IS: no forward => own packet received");
+            }
         }
 
-        aprsIsMsg->setPath(path + "qAR," + system.getUserConfig()->callsign);
+        if (system.getUserConfig()->digi.active && (modemMsg->getSource() != system.getUserConfig()->callsign))
+        {
+            std::shared_ptr<APRSMessage> digiMsg = std::make_shared<APRSMessage>(*modemMsg);
+            String                       path    = digiMsg->getPath();
 
-        logPrintD("APRS-IS: ");
-        logPrintlnD(aprsIsMsg->toString());
-        _toAprsIs.addElement(aprsIsMsg);
-      } else {
-        logPrintlnD("APRS-IS: no forward => RFonly");
-      }
-    } else {
-      if (!system.getUserConfig()->aprs_is.active)
-        logPrintlnD("APRS-IS: disabled");
+            // simple loop check
+            if ((path.indexOf("WIDE1-1") >= 0) && (path.indexOf(system.getUserConfig()->callsign) == -1))
+            {
+                // fixme
+                digiMsg->setPath(system.getUserConfig()->callsign + "*");
 
-      if (modemMsg->getSource() == system.getUserConfig()->callsign)
-        logPrintlnD("APRS-IS: no forward => own packet received");
+                logPrintD("DIGI: ");
+                logPrintlnD(digiMsg->toString());
+
+                m_toModem.addElement(digiMsg);
+            }
+        }
     }
 
-    if (system.getUserConfig()->digi.active && modemMsg->getSource() != system.getUserConfig()->callsign) {
-      std::shared_ptr<APRSMessage> digiMsg = std::make_shared<APRSMessage>(*modemMsg);
-      String                       path    = digiMsg->getPath();
+    // check for beacon
+    if (m_beacon_timer.hasExpired())
+    {
+        logPrintD("[" + timeString() + "] ");
+        logPrintlnD(m_beaconMsg->encode());
 
-      // simple loop check
-      if (path.indexOf("WIDE1-1") >= 0 && path.indexOf(system.getUserConfig()->callsign) == -1) {
-        // fixme
-        digiMsg->setPath(system.getUserConfig()->callsign + "*");
+        if (system.getUserConfig()->aprs_is.active)
+        {
+            m_toAprsIs.addElement(m_beaconMsg);
+        }
 
-        logPrintD("DIGI: ");
-        logPrintlnD(digiMsg->toString());
+        if (system.getUserConfig()->digi.beacon)
+        {
+            m_toModem.addElement(m_beaconMsg);
+        }
 
-        _toModem.addElement(digiMsg);
-      }
-    }
-  }
+        system.getDisplay().addFrame(std::shared_ptr<DisplayFrame>(new TextFrame("BEACON", m_beaconMsg->toString())));
 
-  // check for beacon
-  if (_beacon_timer.hasExpired()) {
-    logPrintD("[" + timeString() + "] ");
-    logPrintlnD(_beaconMsg->encode());
-
-    if (system.getUserConfig()->aprs_is.active)
-      _toAprsIs.addElement(_beaconMsg);
-
-    if (system.getUserConfig()->digi.beacon) {
-      _toModem.addElement(_beaconMsg);
+        m_beacon_timer.start();
     }
 
-    system.getDisplay().addFrame(std::shared_ptr<DisplayFrame>(new TextFrame("BEACON", _beaconMsg->toString())));
+    unsigned long diff = m_beacon_timer.getRemainingInSecs();
+    m_stateInfo = "beacon " + String(uint32_t(diff / 600)) + String(uint32_t(diff / 60) % 10) + ":" + String(uint32_t(diff / 10) % 6) + String(uint32_t(diff % 10));
 
-    _beacon_timer.start();
-  }
-
-  unsigned long diff = _beacon_timer.getRemainingInSecs();
-  _stateInfo    = "beacon " + String(uint32_t(diff / 600)) + String(uint32_t(diff / 60) % 10) + ":" + String(uint32_t(diff / 10) % 6) + String(uint32_t(diff % 10));
-
-  return true;
+    return true;
 }

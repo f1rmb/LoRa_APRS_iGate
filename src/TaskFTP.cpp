@@ -6,38 +6,53 @@
 #include "TaskFTP.h"
 #include "project_configuration.h"
 
-FTPTask::FTPTask() : Task(TASK_FTP, TaskFtp), _beginCalled(false) {
+FTPTask::FTPTask() :
+Task(TASK_FTP, TaskFtp),
+m_beginCalled(false)
+{
 }
 
-FTPTask::~FTPTask() {
+FTPTask::~FTPTask()
+{
 }
 
-bool FTPTask::setup(System &system) {
-  for (Configuration::Ftp::User user : system.getUserConfig()->ftp.users) {
+bool FTPTask::setup(System &system)
+{
+  for (Configuration::Ftp::User user : system.getUserConfig()->ftp.users)
+  {
     logPrintD("Adding user to FTP Server: ");
     logPrintlnD(user.name);
-    _ftpServer.addUser(user.name, user.password);
+    m_ftpServer.addUser(user.name, user.password);
   }
-  _ftpServer.addFilesystem("SPIFFS", &SPIFFS);
-  _stateInfo = "waiting";
+
+  m_ftpServer.addFilesystem("SPIFFS", &SPIFFS);
+  m_stateInfo = "waiting";
   return true;
 }
 
-bool FTPTask::loop(System &system) {
-  if (!_beginCalled) {
-    _ftpServer.begin();
-    _beginCalled = true;
+bool FTPTask::loop(System &system)
+{
+  if (!m_beginCalled)
+  {
+    m_ftpServer.begin();
+    m_beginCalled = true;
   }
-  _ftpServer.handle();
+
+  m_ftpServer.handle();
+
   static bool configWasOpen = false;
-  if (configWasOpen && _ftpServer.countConnections() == 0) {
+  if (configWasOpen && m_ftpServer.countConnections() == 0)
+  {
     logPrintlnW("Maybe the config has been changed via FTP, lets restart now to get the new config...");
     logPrintlnW("");
     ESP.restart();
   }
-  if (_ftpServer.countConnections() > 0) {
+
+  if (m_ftpServer.countConnections() > 0)
+  {
     configWasOpen = true;
-    _stateInfo    = "has connection";
+    m_stateInfo    = "has connection";
   }
+
   return true;
 }

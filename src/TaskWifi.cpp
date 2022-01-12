@@ -6,13 +6,18 @@
 #include "TaskWifi.h"
 #include "project_configuration.h"
 
-WifiTask::WifiTask() : Task(TASK_WIFI, TaskWifi), _oldWifiStatus(WL_IDLE_STATUS) {
+WifiTask::WifiTask() :
+Task(TASK_WIFI, TaskWifi),
+m_oldWifiStatus(WL_IDLE_STATUS)
+{
 }
 
-WifiTask::~WifiTask() {
+WifiTask::~WifiTask()
+{
 }
 
-bool WifiTask::setup(System &system) {
+bool WifiTask::setup(System &system)
+{
   // Don't save WiFi configuration in flash
   WiFi.persistent(false);
 
@@ -20,41 +25,53 @@ bool WifiTask::setup(System &system) {
   WiFi.mode(WIFI_STA);
 
   WiFi.onEvent(WiFiEvent);
-  if (system.getUserConfig()->network.hostname.overwrite) {
+  if (system.getUserConfig()->network.hostname.overwrite)
+  {
     WiFi.setHostname(system.getUserConfig()->network.hostname.name.c_str());
-  } else {
+  }
+  else
+  {
     WiFi.setHostname(system.getUserConfig()->callsign.c_str());
   }
 
-  if (!system.getUserConfig()->network.DHCP) {
+  if (!system.getUserConfig()->network.DHCP)
+  {
     WiFi.config(system.getUserConfig()->network.static_.ip, system.getUserConfig()->network.static_.gateway, system.getUserConfig()->network.static_.subnet, system.getUserConfig()->network.static_.dns1, system.getUserConfig()->network.static_.dns2);
   }
 
-  for (Configuration::Wifi::AP ap : system.getUserConfig()->wifi.APs) {
+  for (Configuration::Wifi::AP ap : system.getUserConfig()->wifi.APs)
+  {
     logPrintD("Looking for AP: ");
     logPrintlnD(ap.SSID);
-    _wiFiMulti.addAP(ap.SSID.c_str(), ap.password.c_str());
+    m_wiFiMulti.addAP(ap.SSID.c_str(), ap.password.c_str());
   }
+
   return true;
 }
 
-bool WifiTask::loop(System &system) {
-  const uint8_t wifi_status = _wiFiMulti.run();
-  if (wifi_status != WL_CONNECTED) {
+bool WifiTask::loop(System &system)
+{
+  const uint8_t wifi_status = m_wiFiMulti.run();
+
+  if (wifi_status != WL_CONNECTED)
+  {
     system.connectedViaWifiEth(false);
     logPrintlnE("WiFi not connected!");
-    _oldWifiStatus = wifi_status;
-    _stateInfo     = "WiFi not connected";
-    _state         = Error;
-    return false;
-  } else if (wifi_status != _oldWifiStatus) {
-    logPrintD("IP address: ");
-    logPrintlnD(WiFi.localIP().toString());
-    _oldWifiStatus = wifi_status;
+    m_oldWifiStatus = wifi_status;
+    m_stateInfo     = "WiFi not connected";
+    m_state         = Error;
     return false;
   }
+  else if (wifi_status != m_oldWifiStatus)
+  {
+    logPrintD("IP address: ");
+    logPrintlnD(WiFi.localIP().toString());
+    m_oldWifiStatus = wifi_status;
+    return false;
+  }
+
   system.connectedViaWifiEth(true);
-  _stateInfo = WiFi.localIP().toString();
-  _state     = Okay;
+  m_stateInfo = WiFi.localIP().toString();
+  m_state     = Okay;
   return true;
 }
