@@ -10,10 +10,7 @@ DisplayTask::~DisplayTask() {
 }
 
 bool DisplayTask::setup(System &system) {
-  system.getDisplay().setup(system.getBoardConfig());
-  if (system.getUserConfig()->display.turn180) {
-    system.getDisplay().turn180();
-  }
+  system.getDisplay().setup(system.getBoardConfig(), system.getUserConfig()->display.turn180);
   std::shared_ptr<StatusFrame> statusFrame = std::shared_ptr<StatusFrame>(new StatusFrame(system.getTaskManager().getTasks()));
   system.getDisplay().setStatusFrame(statusFrame);
   if (!system.getUserConfig()->display.alwaysOn) {
@@ -26,7 +23,7 @@ bool DisplayTask::setup(System &system) {
 
 bool DisplayTask::loop(System &system) {
   if (system.getUserConfig()->display.overwritePin != 0 && !digitalRead(system.getUserConfig()->display.overwritePin)) {
-    system.getDisplay().activateDistplay();
+    system.getDisplay().activateDisplay();
   }
   system.getDisplay().update();
   return true;
