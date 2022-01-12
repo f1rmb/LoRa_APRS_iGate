@@ -34,14 +34,15 @@ std::shared_ptr<APRSMessage> LoRa_APRS::getMessage() {
 void LoRa_APRS::sendMessage(const std::shared_ptr<APRSMessage> msg) {
   setFrequency(_TxFrequency);
   String data = msg->encode();
-  beginPacket();
-  // Header:
-  write('<');
-  write(0xFF);
-  write(0x01);
-  // APRS Data:
-  write((const uint8_t *)data.c_str(), data.length());
-  endPacket();
+  if (beginPacket()) {
+      // Header:
+      write('<');
+      write(0xFF);
+      write(0x01);
+      // APRS Data:
+      write((const uint8_t *)data.c_str(), data.length());
+      endPacket();
+  }
   setFrequency(_RxFrequency);
 }
 
