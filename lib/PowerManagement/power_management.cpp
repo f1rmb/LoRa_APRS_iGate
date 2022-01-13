@@ -7,11 +7,13 @@ PowerManagement::PowerManagement()
 
 bool PowerManagement::begin(TwoWire &port)
 {
-    bool result = m_axp.begin(port, AXP192_SLAVE_ADDRESS);
-    if (!result)
+    bool result = (m_axp.begin(port, AXP192_SLAVE_ADDRESS) == AXP_PASS);
+
+    if (result)
     {
-        m_axp.setDCDC1Voltage(3300);
+        result = (m_axp.setDCDC1Voltage(3300) == AXP_PASS);
     }
+
     return result;
 }
 

@@ -85,7 +85,7 @@ void setup()
     {
         Wire.begin(boardConfig->OledSda, boardConfig->OledScl);
         PowerManagement powerManagement;
-        if (!powerManagement.begin(Wire))
+        if (powerManagement.begin(Wire))
         {
             logPrintlnI("AXP192 init done!");
         }
@@ -96,6 +96,44 @@ void setup()
         powerManagement.activateLoRa();
         powerManagement.activateOLED();
         powerManagement.deactivateGPS();
+
+        // Use the user button to lit the screen, if overwritePin is not defined
+        if ((userConfig.display.alwaysOn == false) && (userConfig.display.overwritePin == 0))
+        {
+            userConfig.display.overwritePin = 38;
+        }
+    }
+    else if (boardConfig->Type == eTTGO_T_Beam_V0_7)
+    {
+        HardwareSerial ss(1);
+        const uint8_t gnssPowerOff[] = { 0xB5, 0x62, 0x02, 0x41, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x4D, 0x3B };
+
+        //
+        // Powering OFF the GNSS
+        //
+        ss.begin(9600, SERIAL_8N1, 12, 15);
+
+        // Wait for some incoming data
+        unsigned long startTime = millis();
+        while ((millis() - startTime) < 2000)
+        {
+            while (ss.available() == 0)
+            {
+                delay(1);
+            }
+        }
+
+        // Send PowerOff
+        for (size_t i = 0; i < (sizeof(gnssPowerOff) / sizeof(gnssPowerOff[0])); i++)
+        {
+            ss.write(gnssPowerOff[i]);
+        }
+
+        // Use the user button to lit the screen, if overwritePin is not defined
+        if ((userConfig.display.alwaysOn == false) && (userConfig.display.overwritePin == 0))
+        {
+            userConfig.display.overwritePin = 39;
+        }
     }
 
     LoRaSystem.setBoardConfig(boardConfig);
