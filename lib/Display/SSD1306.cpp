@@ -28,7 +28,7 @@ void SSD1306::internDisplay(Bitmap *bitmap)
     uint8_t *ptr = bitmap->m_buffer;
 
     m_wire->beginTransmission(m_address);
-    m_wire->write(0x40U);
+    m_wire->write(0x40U); // Co: 0, D/C: 1 => write GDDRAM, data byte only
     uint8_t bytesOut = 1;
 
     while (count--)
@@ -46,9 +46,10 @@ void SSD1306::internDisplay(Bitmap *bitmap)
     m_wire->endTransmission();
 }
 
-void SSD1306::sendCommand(uint8_t command) {
+void SSD1306::sendCommand(uint8_t command)
+{
     m_wire->beginTransmission(m_address);
-    m_wire->write(0x80);
+    m_wire->write(0x00U); // Co: 0, D/C: 0 => write command, data byte only
     m_wire->write(command);
     m_wire->endTransmission();
 }
@@ -56,7 +57,7 @@ void SSD1306::sendCommand(uint8_t command) {
 void SSD1306::sendCommandList(const uint8_t *c, uint8_t n)
 {
     m_wire->beginTransmission(m_address);
-    m_wire->write(0x00U);
+    m_wire->write(0x00U); // Co: 0, D/C: 0 => write command, data byte only
     uint8_t bytesOut = 1;
 
     while (n--)
@@ -73,4 +74,3 @@ void SSD1306::sendCommandList(const uint8_t *c, uint8_t n)
     }
     m_wire->endTransmission();
 }
-

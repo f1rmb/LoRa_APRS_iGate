@@ -50,7 +50,6 @@ bool ModemTask::loop(System &system)
     if (m_lora_aprs.checkMessage())
     {
         std::shared_ptr<APRSMessage> msg = m_lora_aprs.getMessage();
-        // msg->getAPRSBody()->setData(msg->getAPRSBody()->getData() + " 123");
         logPrintD("[" + timeString() + "] ");
         logPrintD("Received packet '");
         logPrintD(msg->toString());
