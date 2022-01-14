@@ -68,7 +68,7 @@ bool ModemTask::loop(System &system)
             logPrintlnD(String(snr, 2));
         }
 
-        // Add RSSI and SNR, if values are valid and this feature enabled in configuration
+        // Add RSSI and SNR, if values are valid and this feature is enabled in configuration
         if (system.getUserConfig()->aprs.add_rssi_and_snr && (rssi != INT_MAX) && (std::isnan(snr) == false))
         {
             String dao;
@@ -80,7 +80,7 @@ bool ModemTask::loop(System &system)
             int daoOffset;
             if ((daoOffset = body.lastIndexOf('!')) >= 4) // last '!'
             {
-                if (body[daoOffset - 4] == '!') // first '!'
+                if (body[daoOffset - 4] == '!') // previous '!'
                 {
                     dao = body.substring(daoOffset - 4, daoOffset + 1); // extract the DAO
                     body.remove(daoOffset - 4, 5); // Remove the DAO from the current body
@@ -90,7 +90,7 @@ bool ModemTask::loop(System &system)
                 }
             }
 
-            msg->getBody()->setData(body + " - rssi: " + rssi + "dBm - snr: " + String(snr, 2) + "dB" + dao);
+            msg->getBody()->setData(body + " - RSSI: " + rssi + "dBm - SNR: " + String(snr, 2) + "dB" + dao);
         }
 
         m_fromModem.addElement(msg);
