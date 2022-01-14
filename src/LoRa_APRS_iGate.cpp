@@ -18,7 +18,7 @@
 #include "TaskWifi.h"
 #include "ProjectConfiguration.h"
 
-#define VERSION "22.02.4"
+#define VERSION "22.02.5"
 
 TaskQueue<std::shared_ptr<APRSMessage>> toAprsIs;
 TaskQueue<std::shared_ptr<APRSMessage>> fromModem;

@@ -65,5 +65,8 @@
 			}
 		]
 	},
+	"aprs": {
+		"add_rssi_and_snr": true
+	},
 	"ntp_server": "pool.ntp.org"
 }

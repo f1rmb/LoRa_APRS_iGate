@@ -2,7 +2,9 @@
 
 LoRa_APRS::LoRa_APRS() :
 m_RxFrequency(433775000),
-m_TxFrequency(433775000)
+m_TxFrequency(433775000),
+m_rssi(INT_MAX),
+m_snr(NAN)
 {
 }
 
@@ -36,6 +38,8 @@ bool LoRa_APRS::checkMessage()
 
     m_LastReceivedMsg = std::shared_ptr<APRSMessage>(new APRSMessage());
     m_LastReceivedMsg->decode(str);
+    m_rssi = packetRssi();
+    m_snr = packetSnr();
     return true;
 }
 
@@ -87,4 +91,14 @@ void LoRa_APRS::setTxFrequency(long frequency)
 long LoRa_APRS::getTxFrequency() const
 {
     return m_TxFrequency;
+}
+
+float LoRa_APRS::getSNR() const
+{
+    return m_snr;
+}
+
+int LoRa_APRS::getRSSI() const
+{
+    return m_rssi;
 }

@@ -25,10 +25,16 @@ class LoRa_APRS : public LoRaClass
         void setTxFrequency(long frequency);
         long getTxFrequency() const;
 
+        float getSNR() const;
+        int getRSSI() const;
+
+
     private:
         std::shared_ptr<APRSMessage> m_LastReceivedMsg;
         long                         m_RxFrequency;
         long                         m_TxFrequency;
+        int                          m_rssi;
+        float                        m_snr;
 };
 
 #endif

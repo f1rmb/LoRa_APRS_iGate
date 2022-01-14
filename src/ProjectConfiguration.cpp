@@ -120,6 +120,11 @@ void ProjectConfigurationManagement::readProjectConfiguration(DynamicJsonDocumen
         conf.ftp.users.push_back(us);
     }
 
+    if (data.containsKey("aprs"))
+    {
+        conf.aprs.add_rssi_and_snr = data["aprs"]["add_rssi_and_snr"] | false;
+    }
+
     if (data.containsKey("ntp_server"))
     {
         conf.ntpServer = data["ntp_server"].as<String>();
@@ -186,6 +191,8 @@ void ProjectConfigurationManagement::writeProjectConfiguration(Configuration &co
         v["name"]     = u.name;
         v["password"] = u.password;
     }
+
+    data["aprs"]["add_rssi_and_snr"] = conf.aprs.add_rssi_and_snr;
 
     data["ntp_server"] = conf.ntpServer;
 

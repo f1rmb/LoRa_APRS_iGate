@@ -161,6 +161,17 @@ class Configuration
                 std::list<User> users;
         };
 
+        class Aprs
+        {
+            public:
+                Aprs() : add_rssi_and_snr(false)
+                {
+
+                }
+
+                bool add_rssi_and_snr;
+        };
+
         Configuration() :
             callsign("NOCALL-10"),
             board(""),
@@ -178,6 +189,7 @@ class Configuration
         LoRa    lora;
         Display display;
         Ftp     ftp;
+        Aprs    aprs;
         String  board;
         String  ntpServer;
 };

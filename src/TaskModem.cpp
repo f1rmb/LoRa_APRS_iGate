@@ -49,14 +49,49 @@ bool ModemTask::loop(System &system)
 {
     if (m_lora_aprs.checkMessage())
     {
+        int rssi = m_lora_aprs.getRSSI();
+        float snr = m_lora_aprs.getSNR();
+
         std::shared_ptr<APRSMessage> msg = m_lora_aprs.getMessage();
         logPrintD("[" + timeString() + "] ");
         logPrintD("Received packet '");
         logPrintD(msg->toString());
-        logPrintD("' with RSSI ");
-        logPrintD(String(m_lora_aprs.packetRssi()));
-        logPrintD(" and SNR ");
-        logPrintlnD(String(m_lora_aprs.packetSnr()));
+        logPrintD("'");
+        if (rssi != INT_MAX)
+        {
+            logPrintD(" RSSI ");
+            logPrintD(String(rssi));
+        }
+        if (std::isnan(snr) == false)
+        {
+            logPrintD(" SNR ");
+            logPrintlnD(String(snr, 2));
+        }
+
+        // Add RSSI and SNR, if values are valid and this feature enabled in configuration
+        if (system.getUserConfig()->aprs.add_rssi_and_snr && (rssi != INT_MAX) && (std::isnan(snr) == false))
+        {
+            String dao;
+            String body = msg->getBody()->getData();
+
+            body.trim();
+
+            // Search for the DAO
+            int daoOffset;
+            if ((daoOffset = body.lastIndexOf('!')) >= 4) // last '!'
+            {
+                if (body[daoOffset - 4] == '!') // first '!'
+                {
+                    dao = body.substring(daoOffset - 4, daoOffset + 1); // extract the DAO
+                    body.remove(daoOffset - 4, 5); // Remove the DAO from the current body
+                    body.replace("  ", " "); // Get rid of duplicated spaces
+                    body.trim();
+                    dao = " " + dao; // prepend a space, as DAO will be concatenated with the body message, blindly.
+                }
+            }
+
+            msg->getBody()->setData(body + " - rssi: " + rssi + "dBm - snr: " + String(snr, 2) + "dB" + dao);
+        }
 
         m_fromModem.addElement(msg);
         system.getDisplay().addFrame(std::shared_ptr<DisplayFrame>(new TextFrame("LoRa", msg->toString())));
