@@ -73,25 +73,33 @@ bool ModemTask::loop(System &system)
         {
             String dao;
             String body = msg->getBody()->getData();
+            String bodyUpcase = String(body);
 
-            body.trim();
+            bodyUpcase.toUpperCase();
 
-            // Search for the DAO
-            int daoOffset;
-            if ((daoOffset = body.lastIndexOf('!')) >= 4) // last '!'
+            // Don't add RSSI and SNR if one of them is already part of the frame.
+            if (((bodyUpcase.indexOf(" RSSI: ") >= 0) || (bodyUpcase.indexOf(" SNR: ") >= 0)) == false)
             {
-                if (body[daoOffset - 4] == '!') // previous '!'
-                {
-                    dao = body.substring(daoOffset - 4, daoOffset + 1); // extract the DAO
-                    body.remove(daoOffset - 4, 5); // Remove the DAO from the current body
-                    body.replace("  ", " "); // Get rid of duplicated spaces
-                    body.trim();
-                    dao = " " + dao; // prepend a space, as DAO will be concatenated with the body message, blindly.
-                }
-            }
+                body.trim();
 
-            msg->getBody()->setData(body + " - RSSI: " + rssi + "dBm - SNR: " + String(snr, 2) + "dB" + dao);
+                // Search for the DAO
+                int daoOffset;
+                if ((daoOffset = body.lastIndexOf('!')) >= 4) // last '!'
+                {
+                    if (body[daoOffset - 4] == '!') // previous '!'
+                    {
+                        dao = body.substring(daoOffset - 4, daoOffset + 1); // extract the DAO
+                        body.remove(daoOffset - 4, 5); // Remove the DAO from the current body
+                        body.replace("  ", " "); // Get rid of duplicated spaces
+                        body.trim();
+                        dao = " " + dao; // prepend a space, as DAO will be concatenated with the body message, blindly.
+                    }
+                }
+
+                msg->getBody()->setData(body + " - RSSI: " + rssi + "dBm - SNR: " + String(snr, 2) + "dB" + dao);
+            }
         }
+
 
         m_fromModem.addElement(msg);
         system.getDisplay().addFrame(std::shared_ptr<DisplayFrame>(new TextFrame("LoRa", msg->toString())));
