@@ -164,7 +164,8 @@ class Configuration
         class Aprs
         {
             public:
-                Aprs() : add_rssi_and_snr(false)
+                Aprs() :
+                    add_rssi_and_snr(false)
                 {
 
                 }
