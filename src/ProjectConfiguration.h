@@ -60,7 +60,7 @@ class Configuration
         {
             public:
                 Beacon() :
-                    message("LoRa iGATE & Digi, Info: github.com/peterus/LoRa_APRS_iGate"),
+                    message("LoRa iGATE & Digi, Info: github.com/lora-aprs/LoRa_APRS_iGate"),
                     positionLatitude(0.0),
                     positionLongitude(0.0),
                     timeout(15)
