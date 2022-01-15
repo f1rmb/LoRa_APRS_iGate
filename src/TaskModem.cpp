@@ -71,7 +71,6 @@ bool ModemTask::loop(System &system)
         // Add RSSI and SNR, if values are valid and this feature is enabled in configuration
         if (system.getUserConfig()->aprs.add_rssi_and_snr && (rssi != INT_MAX) && (std::isnan(snr) == false))
         {
-            String dao;
             String body = msg->getBody()->getData();
             String bodyUpcase = String(body);
 
@@ -80,6 +79,8 @@ bool ModemTask::loop(System &system)
             // Don't add RSSI and SNR if one of them is already part of the frame.
             if (((bodyUpcase.indexOf(" RSSI: ") >= 0) || (bodyUpcase.indexOf(" SNR: ") >= 0)) == false)
             {
+                String dao;
+
                 body.trim();
 
                 // Search for the DAO
