@@ -115,9 +115,13 @@ void setup()
 
         // Wait for some incoming data
         unsigned long startTime = millis();
-        while ((millis() - startTime) < 2000)
+        while ((millis() - startTime) < 3000)
         {
-            while (ss.available() == 0)
+            if (ss.available() > 0)
+            {
+                break;
+            }
+            else
             {
                 delay(1);
             }
