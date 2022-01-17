@@ -14,7 +14,7 @@ class Configuration;
 class ConfigurationManagement
 {
     public:
-        explicit ConfigurationManagement(String FilePath);
+        explicit ConfigurationManagement(const String &FilePath, const String &defaultFilePath);
         virtual ~ConfigurationManagement();
 
         void readConfiguration(Configuration &conf);
@@ -25,7 +25,7 @@ class ConfigurationManagement
         virtual void writeProjectConfiguration(Configuration &conf, DynamicJsonDocument &data) = 0;
 
     private:
-        const String m_FilePath;
+        String m_FilePath;
 };
 
 #endif

@@ -199,7 +199,7 @@ class ProjectConfigurationManagement : public ConfigurationManagement
 {
     public:
         explicit ProjectConfigurationManagement() :
-        ConfigurationManagement("/is-cfg.json")
+        ConfigurationManagement("/user_is-cfg.json", "/is-cfg.json")
         {
         }
         virtual ~ProjectConfigurationManagement()

@@ -2,8 +2,11 @@
 #include <SPIFFS.h>
 #include <logger.h>
 
-ConfigurationManagement::ConfigurationManagement(String FilePath) : m_FilePath(FilePath)
+ConfigurationManagement::ConfigurationManagement(const String &FilePath, const String &defaultFilePath)
 {
+    bool userFileIsValid = false;
+    bool success = true;
+
     if (SPIFFS.begin(true) == false)
     {
         logPrintlnI("Mounting SPIFFS was not possible. Trying to format SPIFFS...");
@@ -12,8 +15,26 @@ ConfigurationManagement::ConfigurationManagement(String FilePath) : m_FilePath(F
         if (!SPIFFS.begin())
         {
             logPrintlnE("Formating SPIFFS was not okay!");
+            success = false;
         }
     }
+
+    if (success)
+    {
+        File f = SPIFFS.open(FilePath);
+
+        if (f != 0)
+        {
+            if (f.isDirectory() == false)
+            {
+                userFileIsValid = true;
+            }
+
+            f.close();
+        }
+    }
+
+    m_FilePath = (userFileIsValid ? FilePath : defaultFilePath);
 }
 
 ConfigurationManagement::~ConfigurationManagement()
@@ -32,7 +53,7 @@ void ConfigurationManagement::readConfiguration(Configuration &conf)
 
     DynamicJsonDocument  data(2048);
     DeserializationError error = deserializeJson(data, file);
-    if (error)
+    if (error != DeserializationError::Ok)
     {
         logPrintlnW("Failed to read file, using default configuration.");
     }
