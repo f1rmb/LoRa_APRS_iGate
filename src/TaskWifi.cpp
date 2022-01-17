@@ -4,7 +4,10 @@
 #include "Task.h"
 #include "TaskEth.h"
 #include "TaskWifi.h"
+#include "TaskRouter.h"
 #include "ProjectConfiguration.h"
+
+extern RouterTask routerTask;
 
 WifiTask::WifiTask() :
 Task(TASK_WIFI, TaskWifi),
@@ -51,18 +54,27 @@ bool WifiTask::setup(System &system)
 
 bool WifiTask::loop(System &system)
 {
+    String oldSSID = WiFi.SSID();
     const uint8_t wifi_status = m_wiFiMulti.run();
+    bool ssidHasChanged = (WiFi.SSID() != oldSSID);
 
     if (wifi_status != WL_CONNECTED)
     {
         system.connectedViaWifiEth(false);
+
+        // Set position back to global coordinates
+        if (system.getUserConfig()->wifi.active && (m_oldWifiStatus == WL_CONNECTED))
+        {
+            routerTask.updatePosition(system, system.getUserConfig()->beacon.positionLatitude, system.getUserConfig()->beacon.positionLongitude);
+        }
+
         logPrintlnE("WiFi not connected!");
         m_oldWifiStatus = wifi_status;
         m_stateInfo     = "WiFi not connected";
         m_state         = Error;
         return false;
     }
-    else if (wifi_status != m_oldWifiStatus)
+    else if ((wifi_status != m_oldWifiStatus) || ssidHasChanged)
     {
         uint8_t prevStatus = m_oldWifiStatus;
 
@@ -70,11 +82,25 @@ bool WifiTask::loop(System &system)
         logPrintlnD(WiFi.localIP().toString());
         m_oldWifiStatus = wifi_status;
 
-        if ((prevStatus != WL_CONNECTED) && (wifi_status == WL_CONNECTED))
+        if (((prevStatus != WL_CONNECTED) && (wifi_status == WL_CONNECTED)) || ssidHasChanged)
         {
             system.connectedViaWifiEth(true);
             m_stateInfo = WiFi.localIP().toString();
             m_state     = Okay;
+
+            // Update position, accordingly to connected AP
+            if (system.getUserConfig()->wifi.active)
+            {
+                for (Configuration::Wifi::AP ap : system.getUserConfig()->wifi.APs)
+                {
+                    if (ap.SSID == WiFi.SSID())
+                    {
+                        routerTask.updatePosition(system, ap.positionLatitude, ap.positionLongitude);
+                        break;
+                    }
+                }
+            }
+
             return true;
         }
 

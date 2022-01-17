@@ -54,16 +54,6 @@ void ProjectConfigurationManagement::readProjectConfiguration(DynamicJsonDocumen
         }
     }
 
-    conf.wifi.active = data["wifi"]["active"];
-    JsonArray aps    = data["wifi"]["AP"].as<JsonArray>();
-    for (JsonVariant v : aps)
-    {
-        Configuration::Wifi::AP ap;
-        ap.SSID     = v["SSID"].as<String>();
-        ap.password = v["password"].as<String>();
-        conf.wifi.APs.push_back(ap);
-    }
-
     if (data.containsKey("beacon") && data["beacon"].containsKey("message"))
     {
         conf.beacon.message = data["beacon"]["message"].as<String>();
@@ -72,6 +62,20 @@ void ProjectConfigurationManagement::readProjectConfiguration(DynamicJsonDocumen
     conf.beacon.positionLatitude  = data["beacon"]["position"]["latitude"] | 0.0;
     conf.beacon.positionLongitude = data["beacon"]["position"]["longitude"] | 0.0;
     conf.beacon.timeout           = data["beacon"]["timeout"] | 15;
+
+    conf.wifi.active = data["wifi"]["active"];
+    JsonArray aps    = data["wifi"]["AP"].as<JsonArray>();
+    for (JsonVariant v : aps)
+    {
+        Configuration::Wifi::AP ap;
+        ap.SSID              = v["SSID"].as<String>();
+        ap.password          = v["password"].as<String>();
+        ap.positionLatitude  = v["latitude"] | conf.beacon.positionLatitude;
+        ap.positionLongitude = v["longitude"] | conf.beacon.positionLongitude;
+
+        conf.wifi.APs.push_back(ap);
+    }
+
     conf.aprs_is.active           = data["aprs_is"]["active"] | true;
 
     if (data.containsKey("aprs_is") && data["aprs_is"].containsKey("passcode"))
@@ -156,9 +160,11 @@ void ProjectConfigurationManagement::writeProjectConfiguration(Configuration &co
     JsonArray aps          = data["wifi"].createNestedArray("AP");
     for (Configuration::Wifi::AP ap : conf.wifi.APs)
     {
-        JsonObject v  = aps.createNestedObject();
-        v["SSID"]     = ap.SSID;
-        v["password"] = ap.password;
+        JsonObject v = aps.createNestedObject();
+        v["SSID"]      = ap.SSID;
+        v["password"]  = ap.password;
+        v["latitude"]  = ap.positionLatitude;
+        v["longitude"] = ap.positionLongitude;
     }
 
     data["beacon"]["message"]               = conf.beacon.message;

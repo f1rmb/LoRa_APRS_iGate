@@ -51,6 +51,9 @@ class Configuration
                     public:
                         String SSID;
                         String password;
+                        double positionLatitude;
+                        double positionLongitude;
+
                 };
 
                 std::list<AP> APs;

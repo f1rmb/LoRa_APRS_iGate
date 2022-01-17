@@ -13,13 +13,15 @@ class RouterTask : public Task
         virtual bool setup(System &system) override;
         virtual bool loop(System &system) override;
 
+        void updatePosition(System &system, double latitude, double longitude);
+
     private:
         TaskQueue<std::shared_ptr<APRSMessage>> &m_fromModem;
         TaskQueue<std::shared_ptr<APRSMessage>> &m_toModem;
         TaskQueue<std::shared_ptr<APRSMessage>> &m_toAprsIs;
         std::shared_ptr<APRSMessage>             m_beaconMsg;
         Timer                                    m_beacon_timer;
-        bool                                     m_firstRun;
+        bool                                     m_forceBeaconing;
 };
 
 #endif

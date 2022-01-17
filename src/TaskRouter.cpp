@@ -12,7 +12,7 @@ Task(TASK_ROUTER, TaskRouter),
 m_fromModem(fromModem),
 m_toModem(toModem),
 m_toAprsIs(toAprsIs),
-m_firstRun(true)
+m_forceBeaconing(true)
 {
 }
 
@@ -22,18 +22,13 @@ RouterTask::~RouterTask()
 
 bool RouterTask::setup(System &system)
 {
-    Deg2DDMMMMPosition pLat, pLong;
-    char               latBuf[32], longBuf[32];
-
     // setup beacon
     m_beacon_timer.setTimeout(system.getUserConfig()->beacon.timeout * 60 * 1000);
 
     m_beaconMsg = std::shared_ptr<APRSMessage>(new APRSMessage());
     m_beaconMsg->setSource(system.getUserConfig()->callsign);
     m_beaconMsg->setDestination("APLG01");
-    Deg2DDMMMM::Convert(pLat, system.getUserConfig()->beacon.positionLatitude, false);
-    Deg2DDMMMM::Convert(pLong, system.getUserConfig()->beacon.positionLongitude, false);
-    m_beaconMsg->getBody()->setData(String("=") + Deg2DDMMMM::Format(latBuf, pLat, false) + "L" + Deg2DDMMMM::Format(longBuf, pLong, true) + "&" + system.getUserConfig()->beacon.message);
+    updatePosition(system, system.getUserConfig()->beacon.positionLatitude, system.getUserConfig()->beacon.positionLongitude);
 
     return true;
 }
@@ -101,9 +96,9 @@ bool RouterTask::loop(System &system)
     }
 
     // check for beacon
-    if (m_firstRun || m_beacon_timer.hasExpired())
+    if (m_forceBeaconing || m_beacon_timer.hasExpired())
     {
-        m_firstRun = false;
+        m_forceBeaconing = false;
         logPrintD("[" + timeString() + "] ");
         logPrintlnD(m_beaconMsg->encode());
 
@@ -126,4 +121,21 @@ bool RouterTask::loop(System &system)
     m_stateInfo = "beacon " + String(uint32_t(diff / 600)) + String(uint32_t(diff / 60) % 10) + ":" + String(uint32_t(diff / 10) % 6) + String(uint32_t(diff % 10));
 
     return true;
+}
+
+void RouterTask::updatePosition(System &system, double latitude, double longitude)
+{
+    Deg2DDMMMMPosition pLat, pLong;
+    char               latBuf[32], longBuf[32];
+
+    Deg2DDMMMM::Convert(pLat, latitude, false);
+    Deg2DDMMMM::Convert(pLong, longitude, false);
+    m_beaconMsg->getBody()->setData(String("=") + Deg2DDMMMM::Format(latBuf, pLat, false) + "L" + Deg2DDMMMM::Format(longBuf, pLong, true) + "&" + system.getUserConfig()->beacon.message);
+    logPrintlnD("Updated coords: " + String(latitude) + " " + String(longitude));
+
+    // force beaconing
+    if (m_forceBeaconing == false)
+    {
+        m_forceBeaconing = true;
+    }
 }

@@ -20,6 +20,12 @@
 			{
 				"SSID": "YOURSSID",
 				"password": "YOURPASSWORD"
+			},
+			{
+				"SSID": "OTHER_AP_SSID_WITH_OPTIONAL_COORDS",
+				"password": "OTHER_AP_PASSWORD_WITH_OPTIONAL_COORDS",
+				"latitude": 0.000000,
+				"longitude": 0.000000
 			}
 		]
 	},
