@@ -78,7 +78,8 @@ void WiFiEvent(WiFiEvent_t event)
 }
 
 EthTask::EthTask() :
-Task(TASK_ETH, TaskEth)
+Task(TASK_ETH, TaskEth),
+m_connected(false)
 {
 }
 
@@ -129,16 +130,26 @@ bool EthTask::setup(System &system)
 
 bool EthTask::loop(System &system)
 {
-    if (!eth_connected)
+    if (eth_connected == false)
     {
-        system.connectedViaWifiEth(false);
-        m_stateInfo = "Ethernet not connected";
-        m_state     = Error;
+        if (m_connected)
+        {
+            system.connectedViaWifiEth(false);
+            m_connected = false;
+            m_stateInfo = "Ethernet not connected";
+            m_state     = Error;
+        }
+
         return false;
     }
 
-    system.connectedViaWifiEth(true);
-    m_stateInfo = ETH.localIP().toString();
-    m_state     = Okay;
+    if (m_connected == false)
+    {
+        system.connectedViaWifiEth(true);
+        m_connected = true;
+        m_stateInfo = ETH.localIP().toString();
+        m_state     = Okay;
+    }
+
     return true;
 }

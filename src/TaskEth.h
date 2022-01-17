@@ -15,6 +15,7 @@ class EthTask : public Task
         virtual bool loop(System &system) override;
 
     private:
+        bool m_connected;
 };
 
 #endif
