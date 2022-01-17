@@ -78,6 +78,14 @@ class NTPClient
         String getFormattedTime() const;
 
         /**
+         * Same as above, except it uses the rawtime argument to build the formatted string
+         *
+         * @param rawTime epoch time.
+         * @return time formatted like `hh:mm:ss`
+         */
+        String getFormattedTime(unsigned long rawTime) const;
+
+        /**
          * @return time in seconds since Jan. 1, 1970
          */
         unsigned long getEpochTime() const;

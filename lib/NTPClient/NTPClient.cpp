@@ -211,9 +211,8 @@ int NTPClient::getSeconds() const
     return (this->getEpochTime() % 60);
 }
 
-String NTPClient::getFormattedTime() const
+String NTPClient::getFormattedTime(unsigned long rawTime) const
 {
-    unsigned long rawTime = this->getEpochTime();
     unsigned long hours = (rawTime % 86400L) / 3600;
     String hoursStr = hours < 10 ? "0" + String(hours) : String(hours);
 
@@ -224,6 +223,11 @@ String NTPClient::getFormattedTime() const
     String secondStr = seconds < 10 ? "0" + String(seconds) : String(seconds);
 
     return hoursStr + ":" + minuteStr + ":" + secondStr;
+}
+
+String NTPClient::getFormattedTime() const
+{
+    return getFormattedTime(this->getEpochTime());
 }
 
 void NTPClient::end()

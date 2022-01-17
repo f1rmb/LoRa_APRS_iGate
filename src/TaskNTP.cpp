@@ -8,7 +8,8 @@
 
 NTPTask::NTPTask() :
 Task(TASK_NTP, TaskNtp),
-m_beginCalled(false)
+m_beginCalled(false),
+m_lastEpochTime(0)
 {
 }
 
@@ -35,14 +36,24 @@ bool NTPTask::loop(System &system)
         m_beginCalled = true;
     }
 
+    unsigned long epochTime = 0;
     if (m_ntpClient.update())
     {
-        setTime(m_ntpClient.getEpochTime());
+        setTime((epochTime = m_ntpClient.getEpochTime()));
         logPrintI("Current time: ");
-        logPrintlnI(m_ntpClient.getFormattedTime());
+        logPrintlnI(m_ntpClient.getFormattedTime(epochTime));
+    }
+    else
+    {
+        epochTime = m_ntpClient.getEpochTime();
     }
 
-    m_stateInfo = m_ntpClient.getFormattedTime();
-    m_state     = Okay;
+    if (epochTime != m_lastEpochTime)
+    {
+        m_lastEpochTime = epochTime;
+        m_stateInfo     = m_ntpClient.getFormattedTime(m_lastEpochTime);
+        m_state         = Okay;
+    }
+
     return true;
 }

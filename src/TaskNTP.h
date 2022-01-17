@@ -14,8 +14,9 @@ class NTPTask : public Task
         virtual bool loop(System &system) override;
 
     private:
-        NTPClient m_ntpClient;
-        bool      m_beginCalled;
+        NTPClient      m_ntpClient;
+        bool           m_beginCalled;
+        unsigned long  m_lastEpochTime;
 };
 
 #endif
