@@ -149,6 +149,11 @@ void Display::activateDisplay()
     m_disp->displayOn();
 }
 
+void Display::deactivateDisplay()
+{
+    m_disp->displayOff();
+}
+
 void Display::update()
 {
     if (m_displayFrameRate.hasExpired())

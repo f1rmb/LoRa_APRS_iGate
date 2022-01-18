@@ -14,7 +14,9 @@ class ModemTask : public Task
         virtual bool setup(System &system) override;
         virtual bool loop(System &system) override;
 
+        void shutdown();
     private:
+        bool                                     m_initialized;
         LoRa_APRS                                m_lora_aprs;
         TaskQueue<std::shared_ptr<APRSMessage>> &m_fromModem;
         TaskQueue<std::shared_ptr<APRSMessage>> &m_toModem;

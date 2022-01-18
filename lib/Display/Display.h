@@ -42,6 +42,7 @@ class Display
         void setDisplaySaveTimeout(uint32_t timeout);
 
         void activateDisplay();
+        void deactivateDisplay();
 
         // functions for update loop
         void update();

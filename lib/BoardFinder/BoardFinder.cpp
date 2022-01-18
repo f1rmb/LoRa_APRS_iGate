@@ -2,7 +2,7 @@
 #include <logger.h>
 #include <power_management.h>
 
-BoardConfig::BoardConfig(String name, BoardType type, uint8_t oledsda, uint8_t oledscl, uint8_t oledaddr, uint8_t oledreset, int8_t lorasck, int8_t loramiso, int8_t loramosi, int8_t loracs, uint8_t lorareset, uint8_t lorairq, bool needcheckpowerchip, bool powercheckstatus) :
+BoardConfig::BoardConfig(String name, BoardType type, uint8_t oledsda, uint8_t oledscl, uint8_t oledaddr, uint8_t oledreset, int8_t lorasck, int8_t loramiso, int8_t loramosi, int8_t loracs, uint8_t lorareset, uint8_t lorairq, uint8_t battpin, bool needcheckpowerchip, bool powercheckstatus) :
 Name(name),
 Type(type),
 OledSda(oledsda),
@@ -15,6 +15,7 @@ LoraMosi(loramosi),
 LoraCS(loracs),
 LoraReset(lorareset),
 LoraIRQ(lorairq),
+BattPin(battpin),
 needCheckPowerChip(needcheckpowerchip),
 powerCheckStatus(powercheckstatus)
 {
@@ -142,17 +143,21 @@ bool BoardFinder::checkModemConfig(BoardConfig const *boardConfig)
 
     digitalWrite(boardConfig->LoraCS, HIGH);
 
-    if (response == 0x12) {
+    if (response == 0x12)
+    {
         return true;
     }
     return false;
 }
 
-bool BoardFinder::checkPowerConfig(BoardConfig const *boardConfig) {
-    if (!Wire.begin(boardConfig->OledSda, boardConfig->OledScl)) {
+bool BoardFinder::checkPowerConfig(BoardConfig const *boardConfig)
+{
+    if (!Wire.begin(boardConfig->OledSda, boardConfig->OledScl))
+    {
         logPrintlnW("issue with wire");
         return false;
     }
+
     Wire.beginTransmission(0x34);
     Wire.write(0x03U);
     Wire.endTransmission();
@@ -162,18 +167,20 @@ bool BoardFinder::checkPowerConfig(BoardConfig const *boardConfig) {
     Wire.endTransmission();
 
     logPrintlnD(String(response));
-    if (response == 0x03) {
+    if (response == 0x03)
+    {
         logPrintlnD("power chip found!");
         return true;
     }
+
     logPrintlnD("power chip NOT found");
     return false;
 }
 
 // clang-format off
-BoardConfig TTGO_LORA32_V1        ("TTGO_LORA32_V1",         eTTGO_LORA32_V1,          4, 15, 0x3C,  0,  5, 19, 27, 18, 14, 26);
-BoardConfig TTGO_LORA32_V2        ("TTGO_LORA32_V2",         eTTGO_LORA32_V2,         21, 22, 0x3C,  0,  5, 19, 27, 18, 14, 26, true);
-BoardConfig TTGO_T_Beam_V0_7      ("TTGO_T_Beam_V0_7",       eTTGO_T_Beam_V0_7,       21, 22, 0x3C,  0,  5, 19, 27, 18, 14, 26, true);
+BoardConfig TTGO_LORA32_V1        ("TTGO_LORA32_V1",         eTTGO_LORA32_V1,          4, 15, 0x3C,  0,  5, 19, 27, 18, 14, 26, 35);
+BoardConfig TTGO_LORA32_V2        ("TTGO_LORA32_V2",         eTTGO_LORA32_V2,         21, 22, 0x3C,  0,  5, 19, 27, 18, 14, 26, 35, true);
+BoardConfig TTGO_T_Beam_V0_7      ("TTGO_T_Beam_V0_7",       eTTGO_T_Beam_V0_7,       21, 22, 0x3C,  0,  5, 19, 27, 18, 14, 26, 35, true);
 BoardConfig TTGO_T_Beam_V1_0      ("TTGO_T_Beam_V1_0",       eTTGO_T_Beam_V1_0,       21, 22, 0x3C,  0,  5, 19, 27, 18, 14, 26, true, true);
 BoardConfig ETH_BOARD             ("ETH_BOARD",              eETH_BOARD,              33, 32, 0x3C,  0, 14,  2, 15, 12,  4, 36);
 BoardConfig TRACKERD              ("TRACKERD",               eTRACKERD,                5,  4, 0x3C,  0, 18, 19, 23, 16, 14, 26);

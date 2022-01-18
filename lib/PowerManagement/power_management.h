@@ -17,7 +17,7 @@ class PowerManagement
         void deactivateGPS();
 
         void activateOLED();
-        void decativateOLED();
+        void deactivateOLED();
 
     private:
         AXP20X_Class m_axp;

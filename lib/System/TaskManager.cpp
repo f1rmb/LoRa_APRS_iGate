@@ -24,6 +24,49 @@ std::list<Task *> TaskManager::getTasks()
     return tasks;
 }
 
+Task const *TaskManager::getTaskByName(const String &name) const
+{
+    for (Task *elem : m_alwaysRunTasks)
+    {
+        if (elem->getName() == name)
+        {
+            return (elem);
+        }
+    }
+
+    for (Task *elem : m_tasks)
+    {
+        if (elem->getName() == name)
+        {
+            return (elem);
+        }
+    }
+
+    return NULL;
+}
+
+Task const *TaskManager::getTaskById(TaskID_t id) const
+{
+    for (Task *elem : m_alwaysRunTasks)
+    {
+        if (elem->getTaskId() == id)
+        {
+            return (elem);
+        }
+    }
+
+    for (Task *elem : m_tasks)
+    {
+        if (elem->getTaskId() == id)
+        {
+            return (elem);
+        }
+    }
+
+    return NULL;
+}
+
+
 bool TaskManager::setup(System &system)
 {
     logPrintlnV("will setup all tasks...");

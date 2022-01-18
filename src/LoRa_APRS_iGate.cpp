@@ -16,6 +16,7 @@
 #include "TaskOTA.h"
 #include "TaskRouter.h"
 #include "TaskWifi.h"
+#include "TaskBatterySurvey.h"
 #include "ProjectConfiguration.h"
 
 #define VERSION "22.03.2"
@@ -24,18 +25,19 @@ TaskQueue<std::shared_ptr<APRSMessage>> toAprsIs;
 TaskQueue<std::shared_ptr<APRSMessage>> fromModem;
 TaskQueue<std::shared_ptr<APRSMessage>> toModem;
 
-System        LoRaSystem;
-Configuration userConfig;
+System            LoRaSystem;
+Configuration     userConfig;
 
-DisplayTask displayTask;
-ModemTask   modemTask(fromModem, toModem);
-EthTask     ethTask;
-WifiTask    wifiTask;
-OTATask     otaTask;
-NTPTask     ntpTask;
-FTPTask     ftpTask;
-AprsIsTask  aprsIsTask(toAprsIs);
-RouterTask  routerTask(fromModem, toModem, toAprsIs);
+DisplayTask       displayTask;
+ModemTask         modemTask(fromModem, toModem);
+EthTask           ethTask;
+WifiTask          wifiTask;
+OTATask           otaTask;
+NTPTask           ntpTask;
+FTPTask           ftpTask;
+AprsIsTask        aprsIsTask(toAprsIs);
+RouterTask        routerTask(fromModem, toModem, toAprsIs);
+BatterySurveyTask battTask;
 
 void setup()
 {
@@ -76,6 +78,8 @@ void setup()
             ESP.restart();
         }
     }
+
+    btStop();
 
     logPrintI("Board ");
     logPrintI(boardConfig->Name);
@@ -167,6 +171,11 @@ void setup()
         }
 
         LoRaSystem.getTaskManager().addTask(&aprsIsTask);
+    }
+
+    if (boardConfig->BattPin > 0U)
+    {
+        LoRaSystem.getTaskManager().addTask(&battTask);
     }
 
     LoRaSystem.getTaskManager().setup(LoRaSystem);

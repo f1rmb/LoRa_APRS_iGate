@@ -1,10 +1,11 @@
 #include <logger.h>
 
+#include "Tasks.h"
 #include "TaskDisplay.h"
 #include "ProjectConfiguration.h"
 
 DisplayTask::DisplayTask() :
-Task("DisplayTask", 0)
+Task(TASK_DISPLAY, TaskDisplay)
 {
 }
 

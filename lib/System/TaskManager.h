@@ -13,6 +13,8 @@
 
 class System;
 
+typedef uint8_t TaskID_t;
+
 enum TaskDisplayState
 {
     Error,
@@ -23,14 +25,14 @@ enum TaskDisplayState
 class Task
 {
     public:
-        Task(String &name, int taskId) :
+        Task(String &name, TaskID_t taskId) :
             m_state(Okay),
             m_stateInfo("Booting"),
             m_name(name),
             m_taskId(taskId)
         {
         }
-        Task(const char *name, int taskId) :
+        Task(const char *name, TaskID_t taskId) :
             m_state(Okay),
             m_stateInfo("Booting"),
             m_name(name),
@@ -45,7 +47,8 @@ class Task
         {
             return m_name;
         }
-        int getTaskId() const
+
+        TaskID_t getTaskId() const
         {
             return m_taskId;
         }
@@ -67,8 +70,8 @@ class Task
         String           m_stateInfo;
 
     private:
-        String m_name;
-        int    m_taskId;
+        String           m_name;
+        TaskID_t         m_taskId;
 };
 
 class TaskManager
@@ -82,6 +85,8 @@ class TaskManager
         void              addTask(Task *task);
         void              addAlwaysRunTask(Task *task);
         std::list<Task *> getTasks();
+        Task const       *getTaskByName(const String &name) const;
+        Task const       *getTaskById(TaskID_t id) const;
 
         bool setup(System &system);
         bool loop(System &system);
