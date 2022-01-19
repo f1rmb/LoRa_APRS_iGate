@@ -28,6 +28,7 @@ class Task
         Task(String &name, TaskID_t taskId) :
             m_state(Okay),
             m_stateInfo("Booting"),
+            m_visible(true),
             m_name(name),
             m_taskId(taskId)
         {
@@ -35,6 +36,7 @@ class Task
         Task(const char *name, TaskID_t taskId) :
             m_state(Okay),
             m_stateInfo("Booting"),
+            m_visible(true),
             m_name(name),
             m_taskId(taskId)
         {
@@ -57,9 +59,15 @@ class Task
         {
             return m_state;
         }
+
         String getStateInfo() const
         {
             return m_stateInfo;
+        }
+
+        bool isVisible()
+        {
+            return m_visible;
         }
 
         virtual bool setup(System &system) = 0;
@@ -68,6 +76,7 @@ class Task
     protected:
         TaskDisplayState m_state;
         String           m_stateInfo;
+        bool             m_visible;
 
     private:
         String           m_name;

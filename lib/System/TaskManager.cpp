@@ -116,28 +116,31 @@ void StatusFrame::drawStatusPage(Bitmap &bitmap)
 
     for (Task *task : m_tasks)
     {
-        int x = bitmap.drawString(0, y, false, (task->getName()).substring(0, task->getName().indexOf("Task")));
-        x     = bitmap.drawString(x, y, false, ":  ");
-
-        if (task->getStateInfo().length() == 0)
+        if (task->isVisible())
         {
-            switch (task->getState())
+            int x = bitmap.drawString(0, y, false, (task->getName()).substring(0, task->getName().indexOf("Task")));
+            x     = bitmap.drawString(x, y, false, ":  ");
+
+            if (task->getStateInfo().length() == 0)
             {
-                case Error:
-                    bitmap.drawString(x, y, false, "Error");
-                    break;
-                case Warning:
-                    bitmap.drawString(x, y, false, "Warning");
-                default:
-                    break;
+                switch (task->getState())
+                {
+                    case Error:
+                        bitmap.drawString(x, y, false, "Error");
+                        break;
+                    case Warning:
+                        bitmap.drawString(x, y, false, "Warning");
+                    default:
+                        break;
+                }
+                bitmap.drawString(x, y, false, "Okay");
             }
-            bitmap.drawString(x, y, false, "Okay");
-        }
-        else
-        {
-            bitmap.drawString(x, y, false, task->getStateInfo());
-        }
+            else
+            {
+                bitmap.drawString(x, y, false, task->getStateInfo());
+            }
 
-        y += (getSystemFont()->heightInPixel + 1);
+            y += (getSystemFont()->heightInPixel + 1);
+        }
     }
 }

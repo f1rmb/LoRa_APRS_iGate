@@ -23,6 +23,7 @@ m_batteryPin(0),
 //m_batteryIsCharging(false),
 m_lastBatteryReading(0)
 {
+    m_visible = false; // Do not display its status on screen
 }
 
 BatterySurveyTask::~BatterySurveyTask()
