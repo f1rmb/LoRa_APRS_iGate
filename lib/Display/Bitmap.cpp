@@ -117,12 +117,14 @@ bool Bitmap::getPixel(uint16_t x, uint16_t y) const
 }
 
 // cppcheck-suppress unusedFunction
-void Bitmap::clear() {
+void Bitmap::clear()
+{
     memset(m_buffer, 0, (m_width * m_height) / 8);
 }
 
 // cppcheck-suppress unusedFunction
-void Bitmap::drawLine(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1) {
+void Bitmap::drawLine(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1)
+{
     int dx  = abs(x1 - x0);
     int dy  = abs(y1 - y0);
     int sx  = x0 < x1 ? 1 : -1;
