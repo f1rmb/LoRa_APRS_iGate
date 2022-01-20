@@ -1,5 +1,5 @@
-#ifndef TASK_H_
-#define TASK_H_
+#ifndef TASKS_H_
+#define TASKS_H_
 
 #include "TaskManager.h"
 
