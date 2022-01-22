@@ -19,7 +19,7 @@
 #include "TaskBatterySurvey.h"
 #include "ProjectConfiguration.h"
 
-#define VERSION "22.03.5"
+#define VERSION "22.03.6"
 
 TaskQueue<std::shared_ptr<APRSMessage>> toAprsIs;
 TaskQueue<std::shared_ptr<APRSMessage>> fromModem;
