@@ -1,3 +1,5 @@
+#include <functional>
+
 #include <logger.h>
 
 #include "Tasks.h"
@@ -14,58 +16,74 @@ OTATask::~OTATask()
 {
 }
 
+void OTATask::onStart()
+{
+    String type;
+
+    switch (m_ota.getCommand())
+    {
+        case U_FLASH:
+            type = "sketch";
+            break;
+
+        case U_SPIFFS:
+            type = "filesystem";
+            break;
+
+        case U_AUTH:
+            type = "auth";
+            break;
+
+        default:
+            break;
+    }
+    logPrintlnI("Start updating " + type);
+}
+
+void OTATask::onEnd()
+{
+    logPrintlnI("OTA End");
+}
+
+void OTATask::onProgress(unsigned int progress, unsigned int total)
+{
+    logPrintlnI("Progress: " + (String(progress / (total / 100))) + "%");
+}
+
+void OTATask::onError(ota_error_t error)
+{
+    logPrintE("Error[" + String(error) + "]: ");
+
+    switch (error)
+    {
+        case OTA_AUTH_ERROR:
+            logPrintlnE("Auth Failed");
+            break;
+
+        case OTA_BEGIN_ERROR:
+            logPrintlnE("Begin Failed");
+            break;
+
+        case OTA_CONNECT_ERROR:
+            logPrintlnE("Connect Failed");
+            break;
+
+        case OTA_RECEIVE_ERROR:
+            logPrintlnE("Receive Failed");
+            break;
+
+        case OTA_END_ERROR:
+            logPrintlnE("End Failed");
+            break;
+    }
+}
+
 bool OTATask::setup(System &system)
 {
-    m_ota.onStart([&]()
-    {
-        String type;
-        if (m_ota.getCommand() == U_FLASH)
-        {
-            type = "sketch";
-        }
-        else // U_SPIFFS
-        {
-            type = "filesystem";
-        }
-        logPrintlnI("Start updating " + type);
-    })
-    .onEnd([]()
-    {
-        logPrintlnI("");
-        logPrintlnI("OTA End");
-    })
-    .onProgress([](unsigned int progress, unsigned int total)
-    {
-        logPrintI("Progress: ");
-        logPrintI(String(progress / (total / 100)));
-        logPrintlnI("%");
-    })
-    .onError([](ota_error_t error)
-    {
-        logPrintE("Error[");
-        logPrintE(String(error));
-        logPrintE("]: ");
-        if (error == OTA_AUTH_ERROR)
-        {
-            logPrintlnE("Auth Failed");
-        }
-        else if (error == OTA_BEGIN_ERROR)
-        {
-            logPrintlnE("Begin Failed");
-        }
-        else if (error == OTA_CONNECT_ERROR)
-        {
-            logPrintlnE("Connect Failed");
-        }
-        else if (error == OTA_RECEIVE_ERROR)
-        {
-            logPrintlnE("Receive Failed");
-        }
-        else if (error == OTA_END_ERROR)
-        {
-            logPrintlnE("End Failed");
-        }
-    });
+    m_ota.onStart(std::bind(&OTATask::onStart, this));
+    m_ota.onEnd(std::bind(&OTATask::onEnd, this));
+    m_ota.onProgress(std::bind(&OTATask::onProgress, this, std::placeholders::_1, std::placeholders::_2));
+    m_ota.onError(std::bind(&OTATask::onError, this, std::placeholders::_1));
 
     if (system.getUserConfig()->network.hostname.overwrite)
     {
@@ -76,13 +94,16 @@ bool OTATask::setup(System &system)
         m_ota.setHostname(system.getUserConfig()->callsign.c_str());
     }
 
-    m_stateInfo = "";
+    m_ota.setPort(3232);
+
+    m_stateInfo = "Running";
+    m_state = Okay;
     return true;
 }
 
-bool OTATask::loop(System &system) {
-
-    if (!m_beginCalled)
+bool OTATask::loop(System &system)
+{
+    if (m_beginCalled == false)
     {
         m_ota.begin();
         m_beginCalled = true;
