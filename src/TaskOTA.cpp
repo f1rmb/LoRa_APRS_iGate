@@ -4,6 +4,7 @@
 
 #include "Tasks.h"
 #include "TaskOTA.h"
+#include "TaskWifi.h"
 #include "ProjectConfiguration.h"
 
 OTATask::OTATask() :
@@ -16,9 +17,12 @@ OTATask::~OTATask()
 {
 }
 
-void OTATask::onStart()
+void OTATask::onStart(System &system)
 {
     String type;
+    WifiTask *wifi = (WifiTask *)system.getTaskManager().getTaskById(TaskWifi);
+
+    wifi->enable(false);
 
     switch (m_ota.getCommand())
     {
@@ -40,18 +44,25 @@ void OTATask::onStart()
     logPrintlnI("Start updating " + type);
 }
 
-void OTATask::onEnd()
+void OTATask::onEnd(System &system)
 {
+    WifiTask *wifi = (WifiTask *)system.getTaskManager().getTaskById(TaskWifi);
+
+    wifi->enable(true);
     logPrintlnI("OTA End");
 }
 
-void OTATask::onProgress(unsigned int progress, unsigned int total)
+void OTATask::onProgress(System &system, unsigned int progress, unsigned int total)
 {
     logPrintlnI("Progress: " + (String(progress / (total / 100))) + "%");
 }
 
-void OTATask::onError(ota_error_t error)
+void OTATask::onError(System &system, ota_error_t error)
 {
+    WifiTask *wifi = (WifiTask *)system.getTaskManager().getTaskById(TaskWifi);
+
+    wifi->enable(true);
+
     logPrintE("Error[" + String(error) + "]: ");
 
     switch (error)
@@ -80,10 +91,10 @@ void OTATask::onError(ota_error_t error)
 
 bool OTATask::setup(System &system)
 {
-    m_ota.onStart(std::bind(&OTATask::onStart, this));
-    m_ota.onEnd(std::bind(&OTATask::onEnd, this));
-    m_ota.onProgress(std::bind(&OTATask::onProgress, this, std::placeholders::_1, std::placeholders::_2));
-    m_ota.onError(std::bind(&OTATask::onError, this, std::placeholders::_1));
+    m_ota.onStart(std::bind(&OTATask::onStart, this, system));
+    m_ota.onEnd(std::bind(&OTATask::onEnd, this, system));
+    m_ota.onProgress(std::bind(&OTATask::onProgress, this, system, std::placeholders::_1, std::placeholders::_2));
+    m_ota.onError(std::bind(&OTATask::onError, this, system, std::placeholders::_1));
 
     if (system.getUserConfig()->network.hostname.overwrite)
     {

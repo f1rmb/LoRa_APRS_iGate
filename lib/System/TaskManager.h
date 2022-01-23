@@ -26,6 +26,7 @@ class Task
 {
     public:
         Task(String &name, TaskID_t taskId) :
+            m_enabled(true),
             m_state(Okay),
             m_stateInfo("Booting"),
             m_visible(true),
@@ -34,6 +35,7 @@ class Task
         {
         }
         Task(const char *name, TaskID_t taskId) :
+            m_enabled(true),
             m_state(Okay),
             m_stateInfo("Booting"),
             m_visible(true),
@@ -43,6 +45,16 @@ class Task
         }
         virtual ~Task()
         {
+        }
+
+        bool isEnabled()
+        {
+            return m_enabled;
+        }
+
+        void enable(bool v)
+        {
+            m_enabled = v;
         }
 
         String getName() const
@@ -74,6 +86,7 @@ class Task
         virtual bool loop(System &system)  = 0;
 
     protected:
+        bool             m_enabled;
         TaskDisplayState m_state;
         String           m_stateInfo;
         bool             m_visible;

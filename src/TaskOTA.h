@@ -14,10 +14,10 @@ class OTATask : public Task
         virtual bool loop(System &system) override;
 
     private:
-        void onStart();
-        void onEnd();
-        void onProgress(unsigned int progress, unsigned int total);
-        void onError(ota_error_t error);
+        void onStart(System &system);
+        void onEnd(System &system);
+        void onProgress(System &system, unsigned int progress, unsigned int total);
+        void onError(System &system, ota_error_t error);
 
     private:
         ArduinoOTAClass m_ota;

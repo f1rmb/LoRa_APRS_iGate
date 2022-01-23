@@ -54,6 +54,11 @@ bool WifiTask::setup(System &system)
 
 bool WifiTask::loop(System &system)
 {
+    if (m_enabled == false)
+    {
+        return true;
+    }
+
     String oldSSID = WiFi.SSID();
     const uint8_t wifi_status = m_wiFiMulti.run();
     bool ssidHasChanged = (WiFi.SSID() != oldSSID);
