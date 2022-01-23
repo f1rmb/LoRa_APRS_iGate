@@ -39,9 +39,15 @@ bool NTPTask::loop(System &system)
     unsigned long epochTime = 0;
     if (m_ntpClient.update())
     {
-        setTime((epochTime = m_ntpClient.getEpochTime()));
-        logPrintI("Current time: ");
-        logPrintlnI(m_ntpClient.getFormattedTime(epochTime));
+        epochTime = m_ntpClient.getEpochTime();
+
+        // Update clock on skew only
+        time_t n;
+        if ((n = now()) != time_t(epochTime))
+        {
+            setTime(time_t(epochTime));
+            logPrintlnI("Update current time: " + m_ntpClient.getFormattedTime(epochTime) + ", diff: " + String(int(n - epochTime)));
+        }
     }
     else
     {

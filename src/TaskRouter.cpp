@@ -131,7 +131,7 @@ void RouterTask::updatePosition(System &system, double latitude, double longitud
     Deg2DDMMMM::Convert(pLat, latitude, false);
     Deg2DDMMMM::Convert(pLong, longitude, false);
     m_beaconMsg->getBody()->setData(String("=") + Deg2DDMMMM::Format(latBuf, pLat, false) + "L" + Deg2DDMMMM::Format(longBuf, pLong, true) + "&" + system.getUserConfig()->beacon.message);
-    logPrintlnD("Updated coords: " + String(latitude) + " " + String(longitude));
+    logPrintlnD("Updated coords: " + String(latitude, 6) + " " + String(longitude, 6));
 
     // force beaconing
     if (m_forceBeaconing == false)
