@@ -19,7 +19,7 @@
 #include "TaskBatterySurvey.h"
 #include "ProjectConfiguration.h"
 
-#define VERSION "22.03.6"
+#define VERSION "22.03.7"
 
 TaskQueue<std::shared_ptr<APRSMessage>> toAprsIs;
 TaskQueue<std::shared_ptr<APRSMessage>> fromModem;
@@ -43,6 +43,7 @@ void setup()
 {
     Serial.begin(115200);
     Logger::instance().setSerial(&Serial);
+    Logger::instance().enableColor(false);
     delay(500);
     logPrintlnI("LoRa APRS iGate by OE5BPA (Peter Buchegger)");
     logPrintlnI("Version: " VERSION);
