@@ -42,8 +42,10 @@ BatterySurveyTask battTask;
 void setup()
 {
     Serial.begin(115200);
+#if defined(USE_ESP_LOGGER)
     Logger::instance().setSerial(&Serial);
     Logger::instance().enableColor(false);
+#endif
     delay(500);
     logPrintlnI("LoRa APRS iGate by OE5BPA (Peter Buchegger)");
     logPrintlnI("Version: " VERSION);
