@@ -19,7 +19,7 @@
 #include "TaskBatterySurvey.h"
 #include "ProjectConfiguration.h"
 
-#define VERSION "22.03.8"
+#define VERSION "22.06.0"
 
 TaskQueue<std::shared_ptr<APRSMessage>> toAprsIs;
 TaskQueue<std::shared_ptr<APRSMessage>> fromModem;
@@ -174,6 +174,14 @@ void setup()
         }
 
         LoRaSystem.getTaskManager().addTask(&aprsIsTask);
+    }
+
+    // User want to override the battery pin (change number or disabling it (0))
+    // This would only works if the board doesn't have a Power chip.
+    if ((boardConfig->HasPowerChip == false) && (userConfig.tweaks.voltagePin > -1))
+    {
+        logPrintlnI("Override battery sensing pin to: " + String(userConfig.tweaks.voltagePin, DEC));
+        ((BoardConfig *)boardConfig)->BattPin = uint8_t(userConfig.tweaks.voltagePin);
     }
 
     if (boardConfig->BattPin > 0U)

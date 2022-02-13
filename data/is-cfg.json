@@ -74,5 +74,8 @@
 	"aprs": {
 		"add_rssi_and_snr": true
 	},
+	"tweaks": {
+		"battery_voltage_sensing_pin": -1
+	},
 	"ntp_server": "pool.ntp.org"
 }

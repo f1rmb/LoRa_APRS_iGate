@@ -16,6 +16,7 @@ LoraCS(loracs),
 LoraReset(lorareset),
 LoraIRQ(lorairq),
 BattPin(battpin),
+HasPowerChip(false),
 needCheckPowerChip(needcheckpowerchip),
 powerCheckStatus(powercheckstatus)
 {
@@ -33,12 +34,15 @@ BoardConfig const *BoardFinder::searchBoardConfig()
 
     for (BoardConfig const *boardconf : m_boardConfigs)
     {
-        if (boardconf->needCheckPowerChip && checkPowerConfig(boardconf) == boardconf->powerCheckStatus)
+        bool hasPowerChip = false;
+
+        if (boardconf->needCheckPowerChip && ((hasPowerChip = checkPowerConfig(boardconf)) == boardconf->powerCheckStatus))
         {
             PowerManagement powerManagement;
             Wire.begin(boardconf->OledSda, boardconf->OledScl);
             powerManagement.begin(Wire);
             powerManagement.activateOLED();
+            ((BoardConfig *)boardconf)->HasPowerChip = hasPowerChip;
         }
         else if (boardconf->needCheckPowerChip)
         {
@@ -57,12 +61,15 @@ BoardConfig const *BoardFinder::searchBoardConfig()
 
     for (BoardConfig const *boardconf : m_boardConfigs)
     {
-        if (boardconf->needCheckPowerChip && checkPowerConfig(boardconf) == boardconf->powerCheckStatus)
+        bool hasPowerChip = false;
+
+        if (boardconf->needCheckPowerChip && ((hasPowerChip = checkPowerConfig(boardconf)) == boardconf->powerCheckStatus))
         {
             PowerManagement powerManagement;
             Wire.begin(boardconf->OledSda, boardconf->OledScl);
             powerManagement.begin(Wire);
             powerManagement.activateLoRa();
+            ((BoardConfig *)boardconf)->HasPowerChip = hasPowerChip;
         }
 
         if (checkModemConfig(boardconf))

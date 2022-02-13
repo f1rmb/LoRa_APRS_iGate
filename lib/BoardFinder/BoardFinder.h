@@ -41,6 +41,7 @@ class BoardConfig
         uint8_t LoraIRQ;
 
         uint8_t BattPin;
+        bool    HasPowerChip;
 
         bool needCheckPowerChip;
         bool powerCheckStatus;

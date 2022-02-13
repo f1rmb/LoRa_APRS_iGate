@@ -129,6 +129,11 @@ void ProjectConfigurationManagement::readProjectConfiguration(DynamicJsonDocumen
         conf.aprs.add_rssi_and_snr = data["aprs"]["add_rssi_and_snr"] | false;
     }
 
+    if (data.containsKey("tweaks"))
+    {
+        conf.tweaks.voltagePin = data["tweaks"]["battery_voltage_sensing_pin"] | -1;
+    }
+
     if (data.containsKey("ntp_server"))
     {
         conf.ntpServer = data["ntp_server"].as<String>();
@@ -138,6 +143,7 @@ void ProjectConfigurationManagement::readProjectConfiguration(DynamicJsonDocumen
     {
         conf.board = data["board"].as<String>();
     }
+
 }
 
 void ProjectConfigurationManagement::writeProjectConfiguration(Configuration &conf, DynamicJsonDocument &data)
@@ -199,6 +205,8 @@ void ProjectConfigurationManagement::writeProjectConfiguration(Configuration &co
     }
 
     data["aprs"]["add_rssi_and_snr"] = conf.aprs.add_rssi_and_snr;
+
+    data["tweaks"]["battery_voltage_sensing_pin"] = conf.tweaks.voltagePin;
 
     data["ntp_server"] = conf.ntpServer;
 

@@ -176,6 +176,18 @@ class Configuration
                 bool add_rssi_and_snr;
         };
 
+        class Tweaks
+        {
+            public:
+                Tweaks() :
+                    voltagePin(-1)
+                {
+
+                }
+
+                int16_t voltagePin;
+        };
+
         Configuration() :
             callsign("NOCALL-10"),
             board(""),
@@ -194,6 +206,7 @@ class Configuration
         Display display;
         Ftp     ftp;
         Aprs    aprs;
+        Tweaks  tweaks;
         String  board;
         String  ntpServer;
 };
