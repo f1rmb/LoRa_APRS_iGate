@@ -54,7 +54,8 @@
 		"power": 20,
 		"spreading_factor": 12,
 		"signal_bandwidth": 125000,
-		"coding_rate4": 5
+		"coding_rate4": 5,
+		"rx_only": false
 	},
 	"display": {
 		"always_on": true,

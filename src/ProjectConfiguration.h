@@ -115,7 +115,8 @@ class Configuration
                     power(20),
                     spreadingFactor(12),
                     signalBandwidth(125000),
-                    codingRate4(5)
+                    codingRate4(5),
+                    rxOnly(false)
                 {
                 }
 
@@ -126,6 +127,7 @@ class Configuration
                 int     spreadingFactor;
                 long    signalBandwidth;
                 int     codingRate4;
+                bool    rxOnly;
         };
 
         class Display

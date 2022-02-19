@@ -112,7 +112,7 @@ bool RouterTask::loop(System &system)
             m_toModem.addElement(m_beaconMsg);
         }
 
-        system.getDisplay().addFrame(std::shared_ptr<DisplayFrame>(new TextFrame("BEACON", m_beaconMsg->toString())));
+        system.getDisplay().addFrame(std::shared_ptr<DisplayFrame>(new TextFrame("BEACON", m_beaconMsg->encode())));
 
         m_beacon_timer.start();
     }

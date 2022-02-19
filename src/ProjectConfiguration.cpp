@@ -100,6 +100,14 @@ void ProjectConfigurationManagement::readProjectConfiguration(DynamicJsonDocumen
     conf.lora.spreadingFactor = data["lora"]["spreading_factor"] | 12;
     conf.lora.signalBandwidth = data["lora"]["signal_bandwidth"] | 125000;
     conf.lora.codingRate4     = data["lora"]["coding_rate4"] | 5;
+    conf.lora.rxOnly          = data["lora"]["rx_only"] | false;
+
+    if (conf.lora.rxOnly)
+    {
+        conf.digi.active = false;
+        conf.digi.beacon = false;
+        conf.lora.power  = 0;
+    }
 
     conf.display.alwaysOn     = data["display"]["always_on"] | true;
     conf.display.timeout      = data["display"]["timeout"] | 10;
@@ -190,6 +198,7 @@ void ProjectConfigurationManagement::writeProjectConfiguration(Configuration &co
     data["lora"]["spreading_factor"]        = conf.lora.spreadingFactor;
     data["lora"]["signal_bandwidth"]        = conf.lora.signalBandwidth;
     data["lora"]["coding_rate4"]            = conf.lora.codingRate4;
+    data["lora"]["rx_only"]                 = conf.lora.rxOnly;
     data["display"]["always_on"]            = conf.display.alwaysOn;
     data["display"]["timeout"]              = conf.display.timeout;
     data["display"]["overwrite_pin"]        = conf.display.overwritePin;

@@ -42,7 +42,7 @@ bool ModemTask::setup(System &system)
     m_lora_aprs.setCodingRate4(system.getUserConfig()->lora.codingRate4);
     m_lora_aprs.enableCrc();
 
-    m_stateInfo = "";
+    m_stateInfo = ((system.getUserConfig()->lora.rxOnly) ? "RX Only" : "");
     m_initialized = true;
     return true;
 }
