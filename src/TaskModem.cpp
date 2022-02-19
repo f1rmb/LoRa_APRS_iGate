@@ -107,7 +107,7 @@ bool ModemTask::loop(System &system)
 
 
             m_fromModem.addElement(msg);
-            system.getDisplay().addFrame(std::shared_ptr<DisplayFrame>(new TextFrame("LoRa", msg->toString())));
+            system.getDisplay().addFrame(std::shared_ptr<DisplayFrame>(new TextFrame("LoRa", msg->encode())));
         }
 
         if (!m_toModem.empty())
