@@ -11,6 +11,7 @@
 #include "TaskDisplay.h"
 #include "TaskEth.h"
 #include "TaskFTP.h"
+#include "TaskMQTT.h"
 #include "TaskModem.h"
 #include "TaskNTP.h"
 #include "TaskOTA.h"
@@ -19,11 +20,12 @@
 #include "TaskBatterySurvey.h"
 #include "ProjectConfiguration.h"
 
-#define VERSION "22.07.2"
+#define VERSION "22.08.0"
 
 TaskQueue<std::shared_ptr<APRSMessage>> toAprsIs;
 TaskQueue<std::shared_ptr<APRSMessage>> fromModem;
 TaskQueue<std::shared_ptr<APRSMessage>> toModem;
+TaskQueue<std::shared_ptr<APRSMessage>> toMQTT;
 
 System            LoRaSystem;
 Configuration     userConfig;
@@ -35,8 +37,9 @@ WifiTask          wifiTask;
 OTATask           otaTask;
 NTPTask           ntpTask;
 FTPTask           ftpTask;
+MQTTTask          mqttTask(toMQTT);
 AprsIsTask        aprsIsTask(toAprsIs);
-RouterTask        routerTask(fromModem, toModem, toAprsIs);
+RouterTask        routerTask(fromModem, toModem, toAprsIs, toMQTT);
 BatterySurveyTask battTask;
 
 void setup()
@@ -189,6 +192,11 @@ void setup()
         LoRaSystem.getTaskManager().addTask(&battTask);
     }
 
+    if (userConfig.mqtt.active)
+    {
+        LoRaSystem.getTaskManager().addTask(&mqttTask);
+    }
+
     LoRaSystem.getTaskManager().setup(LoRaSystem);
 
     if ((LoRaSystem.getDisplay().getWidth() == 128) && (LoRaSystem.getDisplay().getHeight() == 64))
@@ -200,6 +208,9 @@ void setup()
         LoRaSystem.getDisplay().showSpashScreen("LoRa  APRS  iGate", VERSION);
     }
 
+    //
+    // Config sanity checks
+    //
     if (userConfig.callsign.startsWith("NOCALL"))
     {
         logPrintlnE("You have to change your settings in 'data/is-cfg.json' and upload it via \"Upload File System image\"!");
@@ -211,6 +222,16 @@ void setup()
     {
         logPrintlnE("No mode selected (iGate or Digi)! You have to activate one of iGate or Digi.");
         LoRaSystem.getDisplay().showStatusScreen("ERROR", "No mode selected (iGate or Digi)! You have to activate one of iGate or Digi.");
+        while (true) { delay(10); }
+    }
+
+    if (userConfig.mqtt.active &&
+            ((userConfig.mqtt.server.length() == 0) || (userConfig.mqtt.port == 0) ||
+                    (userConfig.mqtt.name.length() == 0) || (userConfig.mqtt.password.length() == 0) ||
+                    (userConfig.mqtt.topic.length() == 0)))
+    {
+        logPrintlnE("The MQTT configuration is wrong or incomplete! Please fix this.");
+        LoRaSystem.getDisplay().showStatusScreen("ERROR", "The MQTT configuration is wrong or incomplete! Please fix this.");
         while (true) { delay(10); }
     }
 

@@ -7,11 +7,12 @@
 #include "ProjectConfiguration.h"
 #include "Deg2DDMMMM.h"
 
-RouterTask::RouterTask(TaskQueue<std::shared_ptr<APRSMessage>> &fromModem, TaskQueue<std::shared_ptr<APRSMessage>> &toModem, TaskQueue<std::shared_ptr<APRSMessage>> &toAprsIs) :
+RouterTask::RouterTask(TaskQueue<std::shared_ptr<APRSMessage>> &fromModem, TaskQueue<std::shared_ptr<APRSMessage>> &toModem, TaskQueue<std::shared_ptr<APRSMessage>> &toAprsIs, TaskQueue<std::shared_ptr<APRSMessage>> &toMQTT) :
 Task(TASK_ROUTER, TaskRouter),
 m_fromModem(fromModem),
 m_toModem(toModem),
 m_toAprsIs(toAprsIs),
+m_toMQTT(toMQTT),
 m_forceBeaconing(true)
 {
 }
@@ -39,6 +40,11 @@ bool RouterTask::loop(System &system)
     if (!m_fromModem.empty())
     {
         std::shared_ptr<APRSMessage> modemMsg = m_fromModem.getElement();
+
+        if (system.getUserConfig()->mqtt.active)
+        {
+            m_toMQTT.addElement(modemMsg);
+        }
 
         if (system.getUserConfig()->aprs_is.active && modemMsg->getSource() != system.getUserConfig()->callsign)
         {
@@ -117,8 +123,16 @@ bool RouterTask::loop(System &system)
         m_beacon_timer.start();
     }
 
+    String mqttState = "";
+    if (system.getUserConfig()->mqtt.active)
+    {
+        MQTTTask *mqTask = (MQTTTask *)system.getTaskManager().getTaskById(TaskMQTT);
+
+        mqttState = ((mqTask->getState() == Okay) ? "MQ," : "mq,");
+    }
+
     unsigned long diff = m_beacon_timer.getRemainingInSecs();
-    m_stateInfo = "beacon " + String(uint32_t(diff / 600)) + String(uint32_t(diff / 60) % 10) + ":" + String(uint32_t(diff / 10) % 6) + String(uint32_t(diff % 10));
+    m_stateInfo = mqttState + ("bcn: " + String(uint32_t(diff / 600)) + String(uint32_t(diff / 60) % 10) + ":" + String(uint32_t(diff / 10) % 6) + String(uint32_t(diff % 10)));
 
     return true;
 }

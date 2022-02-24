@@ -15,6 +15,7 @@ enum TaskIDs : TaskID_t
     TaskRouter,
     TaskDisplay,
     TaskBatterySurvey,
+    TaskMQTT,
     TaskSize,
 };
 
@@ -28,5 +29,6 @@ enum TaskIDs : TaskID_t
 #define TASK_ROUTER         "RouterTask"
 #define TASK_DISPLAY        "DisplayTask"
 #define TASK_BATTERY_SURVEY "BattTask"
+#define TASK_MQTT           "MQTTTask"
 
 #endif

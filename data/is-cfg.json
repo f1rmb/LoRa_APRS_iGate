@@ -78,5 +78,13 @@
 	"tweaks": {
 		"battery_voltage_sensing_pin": -1
 	},
+	"mqtt": {
+		"active": false,
+		"server": "",
+		"port": 1883,
+		"name": "",
+		"password": "",
+		"topic": "LoraAPRS/Data"
+	},
 	"ntp_server": "pool.ntp.org"
 }

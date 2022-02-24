@@ -142,6 +142,16 @@ void ProjectConfigurationManagement::readProjectConfiguration(DynamicJsonDocumen
         conf.tweaks.voltagePin = data["tweaks"]["battery_voltage_sensing_pin"] | -1;
     }
 
+    if (data.containsKey("mqtt"))
+    {
+        conf.mqtt.active   = data["mqtt"]["active"] | false;
+        conf.mqtt.server   = data["mqtt"]["server"].as<String>();
+        conf.mqtt.port     = data["mqtt"]["port"] | 1883;
+        conf.mqtt.name     = data["mqtt"]["name"].as<String>();
+        conf.mqtt.password = data["mqtt"]["password"].as<String>();
+        conf.mqtt.topic    = data["mqtt"]["topic"].as<String>();
+    }
+
     if (data.containsKey("ntp_server"))
     {
         conf.ntpServer = data["ntp_server"].as<String>();
@@ -216,6 +226,13 @@ void ProjectConfigurationManagement::writeProjectConfiguration(Configuration &co
     data["aprs"]["add_rssi_and_snr"] = conf.aprs.add_rssi_and_snr;
 
     data["tweaks"]["battery_voltage_sensing_pin"] = conf.tweaks.voltagePin;
+
+    data["mqtt"]["active"]   = conf.mqtt.active;
+    data["mqtt"]["server"]   = conf.mqtt.server;
+    data["mqtt"]["port"]     = conf.mqtt.port;
+    data["mqtt"]["name"]     = conf.mqtt.name;
+    data["mqtt"]["password"] = conf.mqtt.password;
+    data["mqtt"]["topic"]    = conf.mqtt.topic;
 
     data["ntp_server"] = conf.ntpServer;
 

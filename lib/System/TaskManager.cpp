@@ -125,15 +125,17 @@ void StatusFrame::drawStatusPage(Bitmap &bitmap)
             {
                 switch (task->getState())
                 {
+                    case Okay:
+                        bitmap.drawString(x, y, false, "Okay");
+                        break;
                     case Error:
                         bitmap.drawString(x, y, false, "Error");
                         break;
                     case Warning:
-                        bitmap.drawString(x, y, false, "Warning");
                     default:
+                        bitmap.drawString(x, y, false, "Warning");
                         break;
                 }
-                bitmap.drawString(x, y, false, "Okay");
             }
             else
             {

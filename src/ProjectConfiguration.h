@@ -190,6 +190,29 @@ class Configuration
                 int16_t voltagePin;
         };
 
+        class MQTT
+        {
+            public:
+                MQTT() :
+                    active(false),
+                    server(""),
+                    port(1883),
+                    name(""),
+                    password(""),
+                    topic("LoraAPRS/Data")
+                {
+
+                }
+
+                bool     active;
+                String   server;
+                uint16_t port;
+                String   name;
+                String   password;
+                String   topic;
+        };
+
+
         Configuration() :
             callsign("NOCALL-10"),
             board(""),
@@ -207,6 +230,7 @@ class Configuration
         LoRa    lora;
         Display display;
         Ftp     ftp;
+        MQTT    mqtt;
         Aprs    aprs;
         Tweaks  tweaks;
         String  board;
