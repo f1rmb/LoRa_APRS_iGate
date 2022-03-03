@@ -46,14 +46,14 @@ bool RouterTask::loop(System &system)
             m_toMQTT.addElement(modemMsg);
         }
 
-        if (system.getUserConfig()->aprs_is.active && modemMsg->getSource() != system.getUserConfig()->callsign)
+        if (system.getUserConfig()->aprs_is.active && (modemMsg->getSource() != system.getUserConfig()->callsign))
         {
             std::shared_ptr<APRSMessage> aprsIsMsg = std::make_shared<APRSMessage>(*modemMsg);
             String                       path      = aprsIsMsg->getPath();
 
             if (((path.indexOf("RFONLY") != -1) || (path.indexOf("NOGATE") != -1) || (path.indexOf("TCPIP") != -1)) == false)
             {
-                if (!path.isEmpty())
+                if (path.isEmpty() == false)
                 {
                     path += ",";
                 }
@@ -71,7 +71,7 @@ bool RouterTask::loop(System &system)
         }
         else
         {
-            if (!system.getUserConfig()->aprs_is.active)
+            if (system.getUserConfig()->aprs_is.active == false)
             {
                 logPrintlnD("APRS-IS: disabled");
             }

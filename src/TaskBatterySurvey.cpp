@@ -6,6 +6,7 @@
 #include "Tasks.h"
 #include "TaskBatterySurvey.h"
 #include "TaskModem.h"
+#include "TaskWifi.h"
 #include "ProjectConfiguration.h"
 #include "power_management.h"
 
@@ -102,14 +103,18 @@ void BatterySurveyTask::updateVoltageReading(System &system)
                         32, 33, 34, 35, 36, 37 /*, 38, 39 */
                 };
                 ModemTask *modem = (ModemTask *)system.getTaskManager().getTaskById(TaskModem);
-
                 if (modem)
                 {
                     modem->shutdown(); // Shutdown the LoRa module
                 }
 
                 system.getDisplay().deactivateDisplay();
-                WiFi.mode(WIFI_OFF);
+
+                WifiTask *wifi = (WifiTask *)system.getTaskManager().getTaskById(TaskWifi);
+                if (wifi)
+                {
+                    wifi->enable(false);
+                }
 
                 for (size_t i = 0; i < sizeof(rtcGpios); i++)
                 {

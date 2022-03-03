@@ -5,6 +5,8 @@
 #include <list>
 #include <memory>
 
+#include <logger.h>
+
 #include <BoardFinder.h>
 #include <Display.h>
 #include <configuration.h>
@@ -52,9 +54,9 @@ class Task
             return m_enabled;
         }
 
-        void enable(bool v)
+        virtual void enable(bool value)
         {
-            m_enabled = v;
+            m_enabled = value;
         }
 
         String getName() const

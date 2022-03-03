@@ -52,6 +52,16 @@ bool WifiTask::setup(System &system)
     return true;
 }
 
+void WifiTask::enable(bool value)
+{
+    Task::enable(value);
+
+    if (value == false)
+    {
+        WiFi.mode(WIFI_OFF);
+    }
+}
+
 bool WifiTask::loop(System &system)
 {
     if (m_enabled == false)

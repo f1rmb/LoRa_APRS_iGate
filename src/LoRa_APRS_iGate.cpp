@@ -20,7 +20,7 @@
 #include "TaskBatterySurvey.h"
 #include "ProjectConfiguration.h"
 
-#define VERSION "22.08.0"
+#define VERSION "22.09.0"
 
 TaskQueue<std::shared_ptr<APRSMessage>> toAprsIs;
 TaskQueue<std::shared_ptr<APRSMessage>> fromModem;
@@ -177,6 +177,12 @@ void setup()
         }
 
         LoRaSystem.getTaskManager().addTask(&aprsIsTask);
+    }
+
+    // Disable (power off) wifi module if not used.
+    if (userConfig.wifi.active == false)
+    {
+        wifiTask.enable(false);
     }
 
     // User want to override the battery pin (change number or disabling it (0))

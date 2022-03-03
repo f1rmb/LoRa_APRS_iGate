@@ -10,6 +10,7 @@ class WifiTask : public Task
         WifiTask();
         virtual ~WifiTask();
 
+        virtual void enable(bool enabled) override;
         virtual bool setup(System &system) override;
         virtual bool loop(System &system) override;
 
