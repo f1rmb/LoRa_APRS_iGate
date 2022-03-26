@@ -3,6 +3,7 @@
 
 #include <list>
 #include <memory>
+#include <logger.h>
 
 #include <Arduino.h>
 #ifndef CPPCHECK
@@ -14,11 +15,11 @@ class Configuration;
 class ConfigurationManagement
 {
     public:
-        explicit ConfigurationManagement(const String &FilePath, const String &defaultFilePath);
+        explicit ConfigurationManagement(logging::Logger &logger, const String &FilePath, const String &defaultFilePath);
         virtual ~ConfigurationManagement();
 
-        void readConfiguration(Configuration &conf);
-        void writeConfiguration(Configuration &conf);
+        void readConfiguration(logging::Logger &logger, Configuration &conf);
+        void writeConfiguration(logging::Logger &logger, Configuration &conf);
 
     private:
         virtual void readProjectConfiguration(DynamicJsonDocument &data, Configuration &conf)  = 0;

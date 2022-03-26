@@ -16,7 +16,7 @@ class MQTTTask : public Task
         virtual bool loop(System &system) override;
 
     private:
-        bool connect(const System &system);
+        bool connect(System &system);
 
     private:
         TaskQueue<std::shared_ptr<APRSMessage>> &m_toMQTT;

@@ -16,7 +16,7 @@ class AprsIsTask : public Task
         virtual bool loop(System &system) override;
 
     private:
-        bool connect(const System &system);
+        bool connect(System &system);
 
     private:
         APRS_IS                                  m_aprs_is;

@@ -27,7 +27,7 @@ bool ModemTask::setup(System &system)
 
     if (!m_lora_aprs.begin(system.getUserConfig()->lora.frequencyRx))
     {
-        logPrintlnE("Starting LoRa failed!");
+        system.getLogger().log(logging::LoggerLevel::LOGGER_LEVEL_ERROR, getName(), "Starting LoRa failed!");
         m_stateInfo = "LoRa-Modem failed";
         m_state     = Error;
         while (true) { delay(10); }
@@ -57,20 +57,7 @@ bool ModemTask::loop(System &system)
             float snr = m_lora_aprs.getSNR();
 
             std::shared_ptr<APRSMessage> msg = m_lora_aprs.getMessage();
-            logPrintD("[" + timeString() + "] ");
-            logPrintD("Received packet '");
-            logPrintD(msg->toString());
-            logPrintD("'");
-            if (rssi != INT_MAX)
-            {
-                logPrintD(" RSSI ");
-                logPrintD(String(rssi));
-            }
-            if (std::isnan(snr) == false)
-            {
-                logPrintD(" SNR ");
-                logPrintlnD(String(snr, 2));
-            }
+            system.getLogger().log(logging::LoggerLevel::LOGGER_LEVEL_DEBUG, getName(), "[%s] Received packet '%s' with RSSI %ddBm and SNR %.2fdBm", timeString().c_str(), msg->toString().c_str(), m_lora_aprs.packetRssi(), m_lora_aprs.packetSnr());
 
             // Add RSSI and SNR, if values are valid and this feature is enabled in configuration
             if (system.getUserConfig()->aprs.add_rssi_and_snr && (rssi != INT_MAX) && (std::isnan(snr) == false))
@@ -107,7 +94,7 @@ bool ModemTask::loop(System &system)
 
 
             m_fromModem.addElement(msg);
-            system.getDisplay().addFrame(std::shared_ptr<DisplayFrame>(new TextFrame("LoRa", msg->encode())));
+            system.getDisplay().addFrame(std::shared_ptr<DisplayFrame>(new TextFrame("LoRa", msg->encode().c_str()))); // Shortest version, fits the screen
         }
 
         if (!m_toModem.empty())

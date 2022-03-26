@@ -9,24 +9,23 @@ void APRS_IS::setup(const String &user, const String &passcode, const String &to
     m_version   = version;
 }
 
-bool APRS_IS::connect(const String &server, const int port)
+APRS_IS::ConnectionStatus APRS_IS::connect(const String &server, const int port)
 {
     const String login = "user " + m_user + " pass " + m_passcode + " vers " + m_tool_name + " " + m_version + "\n\r";
     return _connect(server, port, login);
 }
 
-bool APRS_IS::connect(const String &server, const int port, const String &filter)
+APRS_IS::ConnectionStatus APRS_IS::connect(const String &server, const int port, const String &filter)
 {
     const String login = "user " + m_user + " pass " + m_passcode + " vers " + m_tool_name + " " + m_version + " filter " + filter + "\n\r";
     return _connect(server, port, login);
 }
 
-bool APRS_IS::_connect(const String &server, const int port, const String &login_line)
+APRS_IS::ConnectionStatus APRS_IS::_connect(const String &server, const int port, const String &login_line)
 {
     if (!m_client.connect(server.c_str(), port))
     {
-        logPrintlnE("Something went wrong on connecting! Is the server reachable?");
-        return false;
+        return ERROR_CONNECTION;
     }
 
     sendMessage(login_line);
@@ -37,17 +36,16 @@ bool APRS_IS::_connect(const String &server, const int port, const String &login
         {
             if (line.indexOf("unverified") == -1)
             {
-                return true;
+                return SUCCESS;
             }
             else
             {
-                logPrintlnE("User can not be verified with passcode!");
-                return false;
+                return ERROR_PASSCODE;
             }
         }
     }
 
-    return true;
+    return SUCCESS;
 }
 
 bool APRS_IS::connected()
@@ -105,7 +103,6 @@ std::shared_ptr<APRSMessage> APRS_IS::getAPRSMessage()
 
     if (line.startsWith("#"))
     {
-        logPrintlnD(line);
         return 0;
     }
 

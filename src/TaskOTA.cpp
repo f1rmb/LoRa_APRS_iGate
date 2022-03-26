@@ -41,7 +41,7 @@ void OTATask::onStart(System &system)
         default:
             break;
     }
-    logPrintlnI("Start updating " + type);
+    system.getLogger().log(logging::LoggerLevel::LOGGER_LEVEL_INFO, getName(), "Start updating %s", type.c_str());
 }
 
 void OTATask::onEnd(System &system)
@@ -49,44 +49,44 @@ void OTATask::onEnd(System &system)
     WifiTask *wifi = (WifiTask *)system.getTaskManager().getTaskById(TaskWifi);
 
     wifi->enable(true);
-    logPrintlnI("OTA End");
+    system.getLogger().log(logging::LoggerLevel::LOGGER_LEVEL_INFO, getName(), "OTA End");
 }
 
 void OTATask::onProgress(System &system, unsigned int progress, unsigned int total)
 {
-    logPrintlnI("Progress: " + (String(progress / (total / 100))) + "%");
+    system.getLogger().log(logging::LoggerLevel::LOGGER_LEVEL_INFO, getName(), "Progress: %f%%", (progress / (total / 100)));
 }
 
 void OTATask::onError(System &system, ota_error_t error)
 {
     WifiTask *wifi = (WifiTask *)system.getTaskManager().getTaskById(TaskWifi);
+    String errStr;
 
     wifi->enable(true);
-
-    logPrintE("Error[" + String(error) + "]: ");
 
     switch (error)
     {
         case OTA_AUTH_ERROR:
-            logPrintlnE("Auth Failed");
+            errStr = "Auth Failed";
             break;
 
         case OTA_BEGIN_ERROR:
-            logPrintlnE("Begin Failed");
+            errStr = "Begin Failed";
             break;
 
         case OTA_CONNECT_ERROR:
-            logPrintlnE("Connect Failed");
+            errStr = "Connect Failed";
             break;
 
         case OTA_RECEIVE_ERROR:
-            logPrintlnE("Receive Failed");
+            errStr = "Receive Failed";
             break;
 
         case OTA_END_ERROR:
-            logPrintlnE("End Failed");
+            errStr = "End Failed";
             break;
     }
+    system.getLogger().log(logging::LoggerLevel::LOGGER_LEVEL_ERROR, getName(), "Error[%d]: %s", error, errStr.c_str());
 }
 
 bool OTATask::setup(System &system)

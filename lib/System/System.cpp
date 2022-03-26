@@ -51,3 +51,8 @@ void System::connectedViaWifiEth(bool status)
 {
     m_isWifiEthConnected = status;
 }
+
+logging::Logger &System::getLogger()
+{
+    return m_logger;
+}

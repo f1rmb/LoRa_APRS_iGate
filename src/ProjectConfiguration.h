@@ -212,11 +212,25 @@ class Configuration
                 String   topic;
         };
 
+        class Syslog
+        {
+            public:
+                Syslog() :
+                    active(false),
+                    server("syslog.lora-aprs.info"),
+                    port(514)
+                {
+                }
+
+                bool   active;
+                String server;
+                int    port;
+        };
 
         Configuration() :
             callsign("NOCALL-10"),
-            board(""),
-            ntpServer("pool.ntp.org")
+            ntpServer("pool.ntp.org"),
+            board("")
         {
 
         };
@@ -233,15 +247,16 @@ class Configuration
         MQTT    mqtt;
         Aprs    aprs;
         Tweaks  tweaks;
-        String  board;
+        Syslog  syslog;
         String  ntpServer;
+        String  board;
 };
 
 class ProjectConfigurationManagement : public ConfigurationManagement
 {
     public:
-        explicit ProjectConfigurationManagement() :
-        ConfigurationManagement("/user_is-cfg.json", "/is-cfg.json")
+        explicit ProjectConfigurationManagement(logging::Logger &logger) :
+        ConfigurationManagement(logger, "/user_is-cfg.json", "/is-cfg.json")
         {
         }
         virtual ~ProjectConfigurationManagement()

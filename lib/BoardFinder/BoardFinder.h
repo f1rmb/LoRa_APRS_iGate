@@ -7,6 +7,7 @@
 #include <Arduino.h>
 #include <SPI.h>
 #include <Wire.h>
+#include <logger.h>
 
 enum BoardType
 {
@@ -52,14 +53,14 @@ class BoardFinder
     public:
         explicit BoardFinder(const std::list<BoardConfig const *> &boardConfigs);
 
-        BoardConfig const *searchBoardConfig();
+        BoardConfig const *searchBoardConfig(logging::Logger &logger);
 
         BoardConfig const *getBoardConfig(String name);
 
     private:
-        bool checkOledConfig(BoardConfig const *boardConfig);
+        bool checkOledConfig(BoardConfig const *boardConfig, logging::Logger &logger);
         bool checkModemConfig(BoardConfig const *boardConfig);
-        bool checkPowerConfig(BoardConfig const *boardConfig);
+        bool checkPowerConfig(BoardConfig const *boardConfig, logging::Logger &logger);
 
     private:
         const std::list<BoardConfig const *> &m_boardConfigs;

@@ -1,6 +1,7 @@
 #ifndef SYSTEM_H_
 #define SYSTEM_H_
 
+#include <logger.h>
 #include <memory>
 
 #include "TaskManager.h"
@@ -23,6 +24,7 @@ class System
         Display                   &getDisplay();
         bool                       isWifiEthConnected() const;
         void                       connectedViaWifiEth(bool status);
+        logging::Logger           &getLogger();
 
     private:
         BoardConfig const   *m_boardConfig;
@@ -30,6 +32,7 @@ class System
         TaskManager          m_taskManager;
         Display              m_display;
         bool                 m_isWifiEthConnected;
+        logging::Logger      m_logger;
 };
 
 #endif

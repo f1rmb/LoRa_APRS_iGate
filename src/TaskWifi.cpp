@@ -44,8 +44,7 @@ bool WifiTask::setup(System &system)
 
     for (Configuration::Wifi::AP ap : system.getUserConfig()->wifi.APs)
     {
-        logPrintD("Looking for AP: ");
-        logPrintlnD(ap.SSID);
+        system.getLogger().log(logging::LoggerLevel::LOGGER_LEVEL_DEBUG, getName(), "Looking for AP: %s", ap.SSID.c_str());
         m_wiFiMulti.addAP(ap.SSID.c_str(), ap.password.c_str());
     }
 
@@ -83,7 +82,7 @@ bool WifiTask::loop(System &system)
             routerTask.updatePosition(system, system.getUserConfig()->beacon.positionLatitude, system.getUserConfig()->beacon.positionLongitude);
         }
 
-        logPrintlnE("WiFi not connected!");
+        system.getLogger().log(logging::LoggerLevel::LOGGER_LEVEL_ERROR, getName(), "WiFi not connected!");
         m_oldWifiStatus = wifi_status;
         m_stateInfo     = "WiFi not connected";
         m_state         = Error;
@@ -93,8 +92,7 @@ bool WifiTask::loop(System &system)
     {
         uint8_t prevStatus = m_oldWifiStatus;
 
-        logPrintD("IP address: ");
-        logPrintlnD(WiFi.localIP().toString());
+        system.getLogger().log(logging::LoggerLevel::LOGGER_LEVEL_DEBUG, getName(), "IP address: %s", WiFi.localIP().toString().c_str());
         m_oldWifiStatus = wifi_status;
 
         if (((prevStatus != WL_CONNECTED) && (wifi_status == WL_CONNECTED)) || ssidHasChanged)

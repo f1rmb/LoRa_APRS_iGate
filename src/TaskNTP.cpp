@@ -46,7 +46,7 @@ bool NTPTask::loop(System &system)
         if ((n = now()) != time_t(epochTime))
         {
             setTime(time_t(epochTime));
-            logPrintlnI("Update current time: " + m_ntpClient.getFormattedTime(epochTime) + ", diff: " + String(int(n - epochTime)));
+            system.getLogger().log(logging::LoggerLevel::LOGGER_LEVEL_INFO, getName(), "Update current time: %s, diff %d", m_ntpClient.getFormattedTime().c_str(), int(n - epochTime));
         }
     }
     else

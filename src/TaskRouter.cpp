@@ -23,7 +23,6 @@ RouterTask::~RouterTask()
 
 bool RouterTask::setup(System &system)
 {
-    // setup beacon
     m_beacon_timer.setTimeout(system.getUserConfig()->beacon.timeout * 60 * 1000);
 
     m_beaconMsg = std::shared_ptr<APRSMessage>(new APRSMessage());
@@ -36,7 +35,6 @@ bool RouterTask::setup(System &system)
 
 bool RouterTask::loop(System &system)
 {
-    // do routing
     if (!m_fromModem.empty())
     {
         std::shared_ptr<APRSMessage> modemMsg = m_fromModem.getElement();
@@ -60,25 +58,24 @@ bool RouterTask::loop(System &system)
 
                 aprsIsMsg->setPath(path + "qAO," + system.getUserConfig()->callsign);
 
-                logPrintD("APRS-IS: ");
-                logPrintlnD(aprsIsMsg->toString());
+                system.getLogger().log(logging::LoggerLevel::LOGGER_LEVEL_INFO, getName(), "APRS-IS: %s", aprsIsMsg->toString().c_str());
                 m_toAprsIs.addElement(aprsIsMsg);
             }
             else
             {
-                logPrintlnD("APRS-IS: no forward => RFonly");
+                system.getLogger().log(logging::LoggerLevel::LOGGER_LEVEL_INFO, getName(), "APRS-IS: no forward => RFonly");
             }
         }
         else
         {
             if (system.getUserConfig()->aprs_is.active == false)
             {
-                logPrintlnD("APRS-IS: disabled");
+                system.getLogger().log(logging::LoggerLevel::LOGGER_LEVEL_INFO, getName(), "APRS-IS: disabled");
             }
 
             if (modemMsg->getSource() == system.getUserConfig()->callsign)
             {
-                logPrintlnD("APRS-IS: no forward => own packet received");
+                system.getLogger().log(logging::LoggerLevel::LOGGER_LEVEL_INFO, getName(), "APRS-IS: no forward => own packet received");
             }
         }
 
@@ -93,8 +90,7 @@ bool RouterTask::loop(System &system)
                 // fixme
                 digiMsg->setPath(system.getUserConfig()->callsign + "*");
 
-                logPrintD("DIGI: ");
-                logPrintlnD(digiMsg->toString());
+                system.getLogger().log(logging::LoggerLevel::LOGGER_LEVEL_INFO, getName(), "DIGI: %s", digiMsg->toString().c_str());
 
                 m_toModem.addElement(digiMsg);
             }
@@ -105,8 +101,7 @@ bool RouterTask::loop(System &system)
     if (m_forceBeaconing || m_beacon_timer.hasExpired())
     {
         m_forceBeaconing = false;
-        logPrintD("[" + timeString() + "] ");
-        logPrintlnD(m_beaconMsg->encode());
+        system.getLogger().log(logging::LoggerLevel::LOGGER_LEVEL_INFO, getName(), "[%s] %s", timeString().c_str(), m_beaconMsg->encode().c_str());
 
         if (system.getUserConfig()->aprs_is.active)
         {
@@ -145,7 +140,7 @@ void RouterTask::updatePosition(System &system, double latitude, double longitud
     Deg2DDMMMM::Convert(pLat, latitude, false);
     Deg2DDMMMM::Convert(pLong, longitude, false);
     m_beaconMsg->getBody()->setData(String("=") + Deg2DDMMMM::Format(latBuf, pLat, false) + "L" + Deg2DDMMMM::Format(longBuf, pLong, true) + "&" + system.getUserConfig()->beacon.message);
-    logPrintlnD("Updated coords: " + String(latitude, 6) + " " + String(longitude, 6));
+    system.getLogger().log(logging::LoggerLevel::LOGGER_LEVEL_DEBUG, getName(), "Updated coords: %f %f", latitude, longitude);
 
     // force beaconing
     if (m_forceBeaconing == false)

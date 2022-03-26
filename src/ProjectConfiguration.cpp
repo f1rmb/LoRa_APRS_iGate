@@ -152,6 +152,13 @@ void ProjectConfigurationManagement::readProjectConfiguration(DynamicJsonDocumen
         conf.mqtt.topic    = data["mqtt"]["topic"].as<String>();
     }
 
+    if (data.containsKey("syslog"))
+    {
+        conf.syslog.active = data["syslog"]["active"] | false;
+        conf.syslog.server = data["syslog"]["server"].as<String>();
+        conf.syslog.port   = data["syslog"]["port"] | 514;
+    }
+
     if (data.containsKey("ntp_server"))
     {
         conf.ntpServer = data["ntp_server"].as<String>();
@@ -233,6 +240,10 @@ void ProjectConfigurationManagement::writeProjectConfiguration(Configuration &co
     data["mqtt"]["name"]     = conf.mqtt.name;
     data["mqtt"]["password"] = conf.mqtt.password;
     data["mqtt"]["topic"]    = conf.mqtt.topic;
+
+    data["syslog"]["active"] = conf.syslog.active;
+    data["syslog"]["server"] = conf.syslog.server;
+    data["syslog"]["port"]   = conf.syslog.port;
 
     data["ntp_server"] = conf.ntpServer;
 
