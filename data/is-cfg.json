@@ -58,7 +58,7 @@
 		"rx_only": false
 	},
 	"display": {
-		"always_on": true,
+		"always_on": false,
 		"timeout": 10,
 		"overwrite_pin": 0,
 		"turn180": true
