@@ -16,7 +16,10 @@ class Timer
 
     private:
         unsigned long m_timeout_ms;
-        unsigned long m_nextTimeout;
+        unsigned long m_start;
+        bool m_hasExpired;
+        bool m_isRunning;
+
 };
 
 #endif

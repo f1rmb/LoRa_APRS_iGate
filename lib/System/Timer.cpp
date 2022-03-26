@@ -4,7 +4,9 @@
 
 Timer::Timer() :
 m_timeout_ms(0UL),
-m_nextTimeout(0UL)
+m_start(0UL),
+m_hasExpired(false),
+m_isRunning(false)
 {
 }
 
@@ -15,33 +17,45 @@ void Timer::setTimeout(const unsigned long timeout_ms)
 
 unsigned long Timer::getRemainingInSecs() const
 {
-    if (m_nextTimeout == 0UL)
+    if (m_isRunning && (m_hasExpired == false))
     {
-        return 0UL;
+        return ((m_timeout_ms - (millis() - m_start)) / 1000UL);
     }
 
-    return (m_nextTimeout - millis()) / 1000;
+    return 0UL;
 }
 
-// cppcheck-suppress unusedFunction
 bool Timer::isRunning() const
 {
-    return (m_nextTimeout > 0UL);
+    return m_isRunning;
 }
 
 bool Timer::hasExpired()
 {
-    return ((m_nextTimeout > 0UL) && (millis() > m_nextTimeout));
+    if (m_isRunning && (m_hasExpired == false))
+    {
+        if ((millis() - m_start) > m_timeout_ms)
+        {
+            m_hasExpired = true;
+        }
+    }
+
+    return m_hasExpired;
 }
 
 void Timer::start()
 {
-    m_nextTimeout = (millis() + m_timeout_ms);
+    if (m_timeout_ms > 0UL)
+    {
+        m_start = millis();
+        m_hasExpired = false;
+        m_isRunning = true;
+    }
 }
 
-// cppcheck-suppress unusedFunction
 void Timer::stop()
 {
-    m_nextTimeout = 0UL;
+    m_hasExpired = false;
+    m_isRunning = false;
 }
 
