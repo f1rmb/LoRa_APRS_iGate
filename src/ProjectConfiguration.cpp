@@ -61,6 +61,7 @@ void ProjectConfigurationManagement::readProjectConfiguration(DynamicJsonDocumen
 
     conf.beacon.positionLatitude  = data["beacon"]["position"]["latitude"] | 0.0;
     conf.beacon.positionLongitude = data["beacon"]["position"]["longitude"] | 0.0;
+    conf.beacon.use_gps           = data["beacon"]["use_gps"] | false;
     conf.beacon.timeout           = data["beacon"]["timeout"] | 15;
 
     conf.wifi.active = data["wifi"]["active"];
@@ -68,8 +69,15 @@ void ProjectConfigurationManagement::readProjectConfiguration(DynamicJsonDocumen
     for (JsonVariant v : aps)
     {
         Configuration::Wifi::AP ap;
-        ap.SSID              = v["SSID"].as<String>();
-        ap.password          = v["password"].as<String>();
+        if (v.containsKey("SSID"))
+        {
+            ap.SSID = v["SSID"].as<String>();
+        }
+        if (v.containsKey("password"))
+        {
+            ap.password = v["password"].as<String>();
+        }
+
         ap.positionLatitude  = v["latitude"] | conf.beacon.positionLatitude;
         ap.positionLongitude = v["longitude"] | conf.beacon.positionLongitude;
 
@@ -119,8 +127,15 @@ void ProjectConfigurationManagement::readProjectConfiguration(DynamicJsonDocumen
     for (JsonVariant u : users)
     {
         Configuration::Ftp::User us;
-        us.name     = u["name"].as<String>();
-        us.password = u["password"].as<String>();
+        if (u.containsKey("name"))
+        {
+            us.name = u["name"].as<String>();
+        }
+        if (u.containsKey("password"))
+        {
+            us.password = u["password"].as<String>();
+        }
+
         conf.ftp.users.push_back(us);
     }
 
@@ -145,17 +160,32 @@ void ProjectConfigurationManagement::readProjectConfiguration(DynamicJsonDocumen
     if (data.containsKey("mqtt"))
     {
         conf.mqtt.active   = data["mqtt"]["active"] | false;
-        conf.mqtt.server   = data["mqtt"]["server"].as<String>();
+        if (data["mqtt"].containsKey("server"))
+        {
+            conf.mqtt.server   = data["mqtt"]["server"].as<String>();
+        }
         conf.mqtt.port     = data["mqtt"]["port"] | 1883;
-        conf.mqtt.name     = data["mqtt"]["name"].as<String>();
-        conf.mqtt.password = data["mqtt"]["password"].as<String>();
-        conf.mqtt.topic    = data["mqtt"]["topic"].as<String>();
+        if (data["mqtt"].containsKey("name"))
+        {
+            conf.mqtt.name     = data["mqtt"]["name"].as<String>();
+        }
+        if (data["mqtt"].containsKey("password"))
+        {
+            conf.mqtt.password = data["mqtt"]["password"].as<String>();
+        }
+        if (data["mqtt"].containsKey("topic"))
+        {
+            conf.mqtt.topic    = data["mqtt"]["topic"].as<String>();
+        }
     }
 
     if (data.containsKey("syslog"))
     {
         conf.syslog.active = data["syslog"]["active"] | false;
-        conf.syslog.server = data["syslog"]["server"].as<String>();
+        if (data["syslog"].containsKey("server"))
+        {
+            conf.syslog.server = data["syslog"]["server"].as<String>();
+        }
         conf.syslog.port   = data["syslog"]["port"] | 514;
     }
 
@@ -201,6 +231,7 @@ void ProjectConfigurationManagement::writeProjectConfiguration(Configuration &co
     data["beacon"]["message"]               = conf.beacon.message;
     data["beacon"]["position"]["latitude"]  = conf.beacon.positionLatitude;
     data["beacon"]["position"]["longitude"] = conf.beacon.positionLongitude;
+    data["beacon"]["use_gps"]               = conf.beacon.use_gps;
     data["beacon"]["timeout"]               = conf.beacon.timeout;
     data["aprs_is"]["active"]               = conf.aprs_is.active;
     data["aprs_is"]["passcode"]             = conf.aprs_is.passcode;

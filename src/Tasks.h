@@ -16,6 +16,7 @@ enum TaskIDs : TaskID_t
     TaskDisplay,
     TaskBatterySurvey,
     TaskMQTT,
+    TaskBeacon,
     TaskSize,
 };
 
@@ -30,5 +31,6 @@ enum TaskIDs : TaskID_t
 #define TASK_DISPLAY        "DisplayTask"
 #define TASK_BATTERY_SURVEY "BattTask"
 #define TASK_MQTT           "MQTTTask"
+#define TASK_BEACON         "BeaconTask"
 
 #endif

@@ -24,7 +24,10 @@ enum BoardType
 class BoardConfig
 {
     public:
-        explicit BoardConfig(String name, BoardType type, uint8_t oledsda, uint8_t oledscl, uint8_t oledaddr, uint8_t oledreset, int8_t lorasck, int8_t loramiso, int8_t loramosi, int8_t loracs, uint8_t lorareset, uint8_t lorairq, uint8_t battpin, bool needcheckpowerchip = false, bool powercheckstatus = false);
+        explicit BoardConfig(String name, BoardType type,
+                uint8_t oledsda, uint8_t oledscl, uint8_t oledaddr, uint8_t oledreset,
+                int8_t lorasck, int8_t loramiso, int8_t loramosi, int8_t loracs, uint8_t lorareset, uint8_t lorairq,
+                uint8_t gpsrx, uint8_t gpstx, uint8_t button, uint8_t battpin, bool needcheckpowerchip = false, bool powercheckstatus = false);
 
         String    Name;
         BoardType Type;
@@ -40,6 +43,10 @@ class BoardConfig
         int8_t LoraCS;
         uint8_t LoraReset;
         uint8_t LoraIRQ;
+
+        uint8_t GpsRx;
+        uint8_t GpsTx;
+        uint8_t Button;
 
         uint8_t BattPin;
         bool    HasPowerChip;

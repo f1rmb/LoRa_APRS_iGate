@@ -66,6 +66,7 @@ class Configuration
                     message("LoRa iGATE & Digi, Info: github.com/lora-aprs/LoRa_APRS_iGate"),
                     positionLatitude(0.0),
                     positionLongitude(0.0),
+                    use_gps(false),
                     timeout(15)
                 {
                 }
@@ -73,6 +74,7 @@ class Configuration
                 String message;
                 double positionLatitude;
                 double positionLongitude;
+                bool   use_gps;
                 int    timeout;
         };
 
@@ -204,12 +206,12 @@ class Configuration
 
                 }
 
-                bool     active;
-                String   server;
-                uint16_t port;
-                String   name;
-                String   password;
-                String   topic;
+                bool   active;
+                String server;
+                int     port;
+                String name;
+                String password;
+                String topic;
         };
 
         class Syslog

@@ -4,10 +4,10 @@
 #include "Tasks.h"
 #include "TaskEth.h"
 #include "TaskWifi.h"
-#include "TaskRouter.h"
+#include "TaskBeacon.h"
 #include "ProjectConfiguration.h"
 
-extern RouterTask routerTask;
+extern BeaconTask beaconTask;
 
 WifiTask::WifiTask() :
 Task(TASK_WIFI, TaskWifi),
@@ -79,7 +79,7 @@ bool WifiTask::loop(System &system)
         // Set position back to global coordinates
         if (system.getUserConfig()->wifi.active && (m_oldWifiStatus == WL_CONNECTED))
         {
-            routerTask.updatePosition(system, system.getUserConfig()->beacon.positionLatitude, system.getUserConfig()->beacon.positionLongitude);
+            beaconTask.updatePosition(system, system.getUserConfig()->beacon.positionLatitude, system.getUserConfig()->beacon.positionLongitude);
         }
 
         system.getLogger().log(logging::LoggerLevel::LOGGER_LEVEL_ERROR, getName(), "WiFi not connected!");
@@ -108,7 +108,7 @@ bool WifiTask::loop(System &system)
                 {
                     if (ap.SSID == WiFi.SSID())
                     {
-                        routerTask.updatePosition(system, ap.positionLatitude, ap.positionLongitude);
+                        beaconTask.updatePosition(system, ap.positionLatitude, ap.positionLongitude);
                         break;
                     }
                 }

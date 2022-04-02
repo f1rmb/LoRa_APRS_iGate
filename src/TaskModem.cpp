@@ -53,11 +53,12 @@ bool ModemTask::loop(System &system)
     {
         if (m_lora_aprs.checkMessage())
         {
-            int rssi = m_lora_aprs.getRSSI();
-            float snr = m_lora_aprs.getSNR();
-
+            int rssi = m_lora_aprs.packetRssi();
+            float snr = m_lora_aprs.packetSnr();
             std::shared_ptr<APRSMessage> msg = m_lora_aprs.getMessage();
-            system.getLogger().log(logging::LoggerLevel::LOGGER_LEVEL_DEBUG, getName(), "[%s] Received packet '%s' with RSSI %ddBm and SNR %.2fdBm", timeString().c_str(), msg->toString().c_str(), m_lora_aprs.packetRssi(), m_lora_aprs.packetSnr());
+
+            system.getLogger().log(logging::LoggerLevel::LOGGER_LEVEL_DEBUG, getName(), "[%s] Received packet '%s' with RSSI %ddBm, SNR %.2fdB and FreqErr %dHz",
+                    timeString().c_str(), msg->toString().c_str(), rssi, snr, -m_lora_aprs.packetFrequencyError());
 
             // Add RSSI and SNR, if values are valid and this feature is enabled in configuration
             if (system.getUserConfig()->aprs.add_rssi_and_snr && (rssi != INT_MAX) && (std::isnan(snr) == false))
@@ -99,8 +100,17 @@ bool ModemTask::loop(System &system)
 
         if (!m_toModem.empty())
         {
-            std::shared_ptr<APRSMessage> msg = m_toModem.getElement();
-            m_lora_aprs.sendMessage(msg);
+            if (m_lora_aprs.rxSignalDetected())
+            {
+                system.getLogger().log(logging::LoggerLevel::LOGGER_LEVEL_DEBUG, getName(), "[%s] RX signal detected. Waiting for TX", timeString().c_str());
+                delay(1000);
+            }
+            else
+            {
+                std::shared_ptr<APRSMessage> msg = m_toModem.getElement();
+                system.getLogger().log(logging::LoggerLevel::LOGGER_LEVEL_DEBUG, getName(), "[%s] Transmitting packet '%s'", timeString().c_str(), msg->toString().c_str());
+                m_lora_aprs.sendMessage(msg);
+            }
         }
     }
     return true;

@@ -8,6 +8,7 @@
 #include <power_management.h>
 
 #include "TaskAprsIs.h"
+#include "TaskBeacon.h"
 #include "TaskDisplay.h"
 #include "TaskEth.h"
 #include "TaskFTP.h"
@@ -20,7 +21,7 @@
 #include "TaskBatterySurvey.h"
 #include "ProjectConfiguration.h"
 
-#define VERSION "22.12.0"
+#define VERSION "22.13.0"
 #define MODULE_NAME "Main"
 
 TaskQueue<std::shared_ptr<APRSMessage>> toAprsIs;
@@ -41,6 +42,7 @@ FTPTask           ftpTask;
 MQTTTask          mqttTask(toMQTT);
 AprsIsTask        aprsIsTask(toAprsIs);
 RouterTask        routerTask(fromModem, toModem, toAprsIs, toMQTT);
+BeaconTask        beaconTask(toModem, toAprsIs);
 BatterySurveyTask battTask;
 
 volatile bool syslogSet = false;
@@ -105,7 +107,15 @@ void setup()
         }
         powerManagement.activateLoRa();
         powerManagement.activateOLED();
-        powerManagement.deactivateGPS();
+
+        if (userConfig.beacon.use_gps)
+        {
+            powerManagement.activateGPS();
+        }
+        else
+        {
+            powerManagement.deactivateGPS();
+        }
 
         // Use the user button to lit the screen, if overwritePin is not defined
         if ((userConfig.display.alwaysOn == false) && (userConfig.display.overwritePin == 0))
@@ -155,20 +165,24 @@ void setup()
     LoRaSystem.getTaskManager().addTask(&displayTask);
     LoRaSystem.getTaskManager().addTask(&modemTask);
     LoRaSystem.getTaskManager().addTask(&routerTask);
+    LoRaSystem.getTaskManager().addTask(&beaconTask);
 
-    if (userConfig.aprs_is.active)
+    bool tcpip = false;
+
+    if (userConfig.wifi.active)
     {
-        if (boardConfig->Type == eETH_BOARD && !userConfig.wifi.active)
-        {
-            LoRaSystem.getTaskManager().addAlwaysRunTask(&ethTask);
-        }
-
-        if (userConfig.wifi.active)
-        {
-            LoRaSystem.getTaskManager().addAlwaysRunTask(&wifiTask);
-        }
-
+        LoRaSystem.getTaskManager().addAlwaysRunTask(&wifiTask);
         LoRaSystem.getTaskManager().addTask(&otaTask);
+        tcpip = true;
+    }
+    else if (boardConfig->Type == eETH_BOARD)
+    {
+        LoRaSystem.getTaskManager().addAlwaysRunTask(&ethTask);
+        tcpip = true;
+    }
+
+    if (tcpip)
+    {
         LoRaSystem.getTaskManager().addTask(&ntpTask);
 
         if (userConfig.ftp.active)
@@ -176,7 +190,15 @@ void setup()
             LoRaSystem.getTaskManager().addTask(&ftpTask);
         }
 
-        LoRaSystem.getTaskManager().addTask(&aprsIsTask);
+        if (userConfig.aprs_is.active)
+        {
+            LoRaSystem.getTaskManager().addTask(&aprsIsTask);
+        }
+
+        if (userConfig.mqtt.active)
+        {
+            LoRaSystem.getTaskManager().addTask(&mqttTask);
+        }
     }
 
     // Disable (power off) wifi module if not used.
@@ -196,11 +218,6 @@ void setup()
     if (boardConfig->BattPin > 0U)
     {
         LoRaSystem.getTaskManager().addTask(&battTask);
-    }
-
-    if (userConfig.mqtt.active)
-    {
-        LoRaSystem.getTaskManager().addTask(&mqttTask);
     }
 
     LoRaSystem.getTaskManager().setup(LoRaSystem);
@@ -243,8 +260,16 @@ void setup()
 
     if (userConfig.display.overwritePin != 0)
     {
-        pinMode(userConfig.display.overwritePin, INPUT);
-        pinMode(userConfig.display.overwritePin, INPUT_PULLUP);
+        // Display's overwritePin collides with board Button pin.
+        if (userConfig.display.overwritePin == boardConfig->Button)
+        {
+            userConfig.display.overwritePin = 0;
+        }
+        else
+        {
+            pinMode(userConfig.display.overwritePin, INPUT);
+            pinMode(userConfig.display.overwritePin, INPUT_PULLUP);
+        }
     }
 
     delay(5000);
@@ -258,7 +283,13 @@ void loop()
     if (LoRaSystem.isWifiEthConnected() && LoRaSystem.getUserConfig()->syslog.active && (syslogSet == false))
     {
         LoRaSystem.getLogger().setSyslogServer(LoRaSystem.getUserConfig()->syslog.server, LoRaSystem.getUserConfig()->syslog.port, LoRaSystem.getUserConfig()->callsign);
+#if 0
         LoRaSystem.getLogger().log(logging::LoggerLevel::LOGGER_LEVEL_INFO, MODULE_NAME, "System connected after a restart to the network, syslog server set");
+#else
+        LoRaSystem.getLogger().log(logging::LoggerLevel::LOGGER_LEVEL_INFO, MODULE_NAME,
+                "System connected after a restart to the network, syslog server set (%s / %d / %s)",
+                LoRaSystem.getUserConfig()->syslog.server.c_str(), LoRaSystem.getUserConfig()->syslog.port, LoRaSystem.getUserConfig()->callsign.c_str());
+#endif
         syslogSet = true;
     }
 }
