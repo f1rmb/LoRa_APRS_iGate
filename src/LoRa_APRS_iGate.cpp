@@ -172,10 +172,10 @@ void setup()
     if (userConfig.wifi.active)
     {
         LoRaSystem.getTaskManager().addAlwaysRunTask(&wifiTask);
-        LoRaSystem.getTaskManager().addTask(&otaTask);
         tcpip = true;
     }
-    else if (boardConfig->Type == eETH_BOARD)
+
+    if (boardConfig->Type == eETH_BOARD)
     {
         LoRaSystem.getTaskManager().addAlwaysRunTask(&ethTask);
         tcpip = true;
@@ -183,6 +183,7 @@ void setup()
 
     if (tcpip)
     {
+        LoRaSystem.getTaskManager().addTask(&otaTask);
         LoRaSystem.getTaskManager().addTask(&ntpTask);
 
         if (userConfig.ftp.active)
