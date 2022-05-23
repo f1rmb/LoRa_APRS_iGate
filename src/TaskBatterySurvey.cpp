@@ -5,7 +5,7 @@
 
 #include "Tasks.h"
 #include "TaskBatterySurvey.h"
-#include "TaskModem.h"
+#include "TaskRadioLib.h"
 #include "TaskWifi.h"
 #include "ProjectConfiguration.h"
 #include "power_management.h"
@@ -102,10 +102,10 @@ void BatterySurveyTask::updateVoltageReading(System &system)
                         /* 25, */ 26, /* 27, */
                         32, 33, 34, 35, 36, 37 /*, 38, 39 */
                 };
-                ModemTask *modem = (ModemTask *)system.getTaskManager().getTaskById(TaskModem);
-                if (modem)
+                RadioLibTask *radio = (RadioLibTask *)system.getTaskManager().getTaskById(TaskRadioLib);
+                if (radio)
                 {
-                    modem->shutdown(); // Shutdown the LoRa module
+                    radio->shutdown(); // Shutdown the LoRa module
                 }
 
                 system.getDisplay().deactivateDisplay();

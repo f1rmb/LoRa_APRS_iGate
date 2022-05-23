@@ -13,7 +13,7 @@
 #include "TaskEth.h"
 #include "TaskFTP.h"
 #include "TaskMQTT.h"
-#include "TaskModem.h"
+#include "TaskRadioLib.h"
 #include "TaskNTP.h"
 #include "TaskOTA.h"
 #include "TaskRouter.h"
@@ -21,7 +21,7 @@
 #include "TaskBatterySurvey.h"
 #include "ProjectConfiguration.h"
 
-#define VERSION "22.14.0"
+#define VERSION "22.21.0"
 #define MODULE_NAME "Main"
 
 TaskQueue<std::shared_ptr<APRSMessage>> toAprsIs;
@@ -33,7 +33,7 @@ System            LoRaSystem;
 Configuration     userConfig;
 
 DisplayTask       displayTask;
-ModemTask         modemTask(fromModem, toModem);
+RadioLibTask      radioTask(fromModem, toModem);
 EthTask           ethTask;
 WifiTask          wifiTask;
 OTATask           otaTask;
@@ -163,7 +163,7 @@ void setup()
     LoRaSystem.setBoardConfig(boardConfig);
     LoRaSystem.setUserConfig(&userConfig);
     LoRaSystem.getTaskManager().addTask(&displayTask);
-    LoRaSystem.getTaskManager().addTask(&modemTask);
+    LoRaSystem.getTaskManager().addTask(&radioTask);
     LoRaSystem.getTaskManager().addTask(&routerTask);
     LoRaSystem.getTaskManager().addTask(&beaconTask);
 

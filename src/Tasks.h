@@ -8,7 +8,7 @@ enum TaskIDs : TaskID_t
     TaskAprsIs = 1,
     TaskEth,
     TaskFtp,
-    TaskModem,
+    TaskRadioLib,
     TaskNtp,
     TaskOta,
     TaskWifi,
@@ -32,5 +32,6 @@ enum TaskIDs : TaskID_t
 #define TASK_BATTERY_SURVEY "BattTask"
 #define TASK_MQTT           "MQTTTask"
 #define TASK_BEACON         "BeaconTask"
+#define TASK_RADIOLIB       "RadioLibTask"
 
 #endif
