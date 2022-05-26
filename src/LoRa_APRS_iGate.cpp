@@ -21,7 +21,7 @@
 #include "TaskBatterySurvey.h"
 #include "ProjectConfiguration.h"
 
-#define VERSION "22.21.0"
+#define VERSION "22.21.1"
 #define MODULE_NAME "Main"
 
 TaskQueue<std::shared_ptr<APRSMessage>> toAprsIs;

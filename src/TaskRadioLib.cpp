@@ -97,7 +97,6 @@ bool RadioLibTask::setup(System &system)
                 m_txEnable = false;
         }
 
-        //m_stateInfo = "LoRa-Modem failed";
         m_state = Error;
     }
 
@@ -108,7 +107,6 @@ bool RadioLibTask::setup(System &system)
         if (state != RADIOLIB_ERR_NONE)
         {
             system.getLogger().log(logging::LoggerLevel::LOGGER_LEVEL_ERROR, getName(), "[%s] setCRC failed, code %d", timeString().c_str(), state);
-            //m_stateInfo = "LoRa-Modem failed";
             m_state = Error;
         }
     }
@@ -126,7 +124,6 @@ bool RadioLibTask::setup(System &system)
         {
             system.getLogger().log(logging::LoggerLevel::LOGGER_LEVEL_ERROR, getName(), "[%s] startRX failed, code %d", timeString().c_str(), state);
             m_rxEnable = false;
-            //m_stateInfo = "LoRa-Modem failed";
             m_state = Error;
         }
     }
@@ -259,8 +256,7 @@ bool RadioLibTask::loop(System &system)
                     {
                         if ((m_config.frequencyRx == m_config.frequencyTx) && ((m_radio->getModemStatus() & 0x01) == 0x01))
                         {
-                            // TODO: REMOVE ME
-                            system.getLogger().log(logging::LoggerLevel::LOGGER_LEVEL_DEBUG, getName(), "[%s] RX signal detected. Waiting TX", timeString().c_str());
+                            //system.getLogger().log(logging::LoggerLevel::LOGGER_LEVEL_DEBUG, getName(), "[%s] RX signal detected. Waiting TX", timeString().c_str());
                         }
                         else
                         {
@@ -280,8 +276,7 @@ bool RadioLibTask::loop(System &system)
                             }
                             else
                             {
-                                // TODO: REMOVE ME
-                                system.getLogger().log(logging::LoggerLevel::LOGGER_LEVEL_DEBUG, getName(), "[%s] TX is not enabled", timeString().c_str());
+                                //system.getLogger().log(logging::LoggerLevel::LOGGER_LEVEL_DEBUG, getName(), "[%s] TX is not enabled", timeString().c_str());
                             }
                         }
                     }
