@@ -23,7 +23,7 @@ enum TaskIDs : TaskID_t
 #define TASK_APRS_IS        "AprsIsTask"
 #define TASK_ETH            "EthTask"
 #define TASK_FTP            "FTPTask"
-#define TASK_MODEM          "ModemTask"
+#define TASK_RADIOLIB       "RadioLibTask"
 #define TASK_NTP            "NTPTask"
 #define TASK_OTA            "OTATask"
 #define TASK_WIFI           "WifiTask"
@@ -32,6 +32,5 @@ enum TaskIDs : TaskID_t
 #define TASK_BATTERY_SURVEY "BattTask"
 #define TASK_MQTT           "MQTTTask"
 #define TASK_BEACON         "BeaconTask"
-#define TASK_RADIOLIB       "RadioLibTask"
 
 #endif
