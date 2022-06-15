@@ -41,7 +41,7 @@ void OTATask::onStart(System &system)
         default:
             break;
     }
-    system.getLogger().log(logging::LoggerLevel::LOGGER_LEVEL_INFO, getName(), "Start updating %s", type.c_str());
+    system.getLogger().log(logging::LoggerLevel::LOGGER_LEVEL_INFO, getName(), "Start updating %s. Please wait, this process is taking some time!", type.c_str());
 }
 
 void OTATask::onEnd(System &system)
@@ -52,10 +52,12 @@ void OTATask::onEnd(System &system)
     system.getLogger().log(logging::LoggerLevel::LOGGER_LEVEL_INFO, getName(), "OTA End");
 }
 
+#if 0
 void OTATask::onProgress(System &system, unsigned int progress, unsigned int total)
 {
     system.getLogger().log(logging::LoggerLevel::LOGGER_LEVEL_INFO, getName(), "Progress: %f%%", (progress / (total / 100)));
 }
+#endif
 
 void OTATask::onError(System &system, ota_error_t error)
 {
@@ -93,7 +95,9 @@ bool OTATask::setup(System &system)
 {
     m_ota.onStart(std::bind(&OTATask::onStart, this, system));
     m_ota.onEnd(std::bind(&OTATask::onEnd, this, system));
+#if 0
     m_ota.onProgress(std::bind(&OTATask::onProgress, this, system, std::placeholders::_1, std::placeholders::_2));
+#endif
     m_ota.onError(std::bind(&OTATask::onError, this, system, std::placeholders::_1));
 
     if (system.getUserConfig()->network.hostname.overwrite)
