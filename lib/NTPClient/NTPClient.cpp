@@ -26,7 +26,7 @@ m_udpSetup(false),
 m_poolServerName("pool.ntp.org"),
 m_port(NTP_DEFAULT_LOCAL_PORT),
 m_timeOffset(0),
-m_updateInterval(60000),
+m_updateInterval(3600000),
 m_currentEpoc(0),
 m_lastUpdate(0)
 {
